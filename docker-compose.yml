@@ -1,5 +1,5 @@
 services:
-  db:
+  db-ozon:
     image: postgres:15
     container_name: db-ozon
     environment:
@@ -19,11 +19,32 @@ services:
       retries: 10
     restart: unless-stopped
 
-  backend:
+  db-payment-service:
+    image: postgres:15
+    container_name: db-payment-service
+    environment:
+      - POSTGRES_DB=study
+      - POSTGRES_USER=study
+      - POSTGRES_PASSWORD=study
+    ports:
+      - 5434:5432
+    volumes:
+      - db-payment-service-data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U study -d study" ]
+      interval: 5s
+      timeout: 1s
+      retries: 10
+    restart: unless-stopped
+
+  ozon-service:
     build:
-      context: .
+      context: ./ozon-service
+      dockerfile: ./ozon-service/Dockerfile
     depends_on:
-      db:
+      db-ozon:
         condition: service_healthy
     environment:
       - DATABASE_HOST=db-ozon
@@ -34,8 +55,25 @@ services:
     networks:
       - backend
 
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: ./payment-service/Dockerfile
+    depends_on:
+      db-payment-service:
+        condition: service_healthy
+    environment:
+      - DATABASE_HOST=db-payment-service
+      - DATABASE_PORT=5432
+    ports:
+      - 8081:8080
+      - 9091:9090
+    networks:
+      - backend
+
 networks:
   backend:
 
 volumes:
   db-ozon-data:
+  db-payment-service-data:
