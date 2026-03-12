@@ -30,4 +30,4 @@ Boot.
 
 # BPMN
 
-![bpmn.png](img/bpmn.png)
+![bpmn.png](img/diagram.svg)
