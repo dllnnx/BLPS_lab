@@ -38,4 +38,31 @@ public interface PickupPointRepository extends JpaRepository<PickupPoint, Long> 
             @Param("lngIn") double lng,
             Pageable pageable
     );
+
+    @Query("""
+                SELECT
+                    p.id as id,
+                    p.address as address,
+                    p.city as city,
+                    p.lat as lat,
+                    p.lng as lng,
+                    (
+                        6371 * acos(
+                            cos(radians(:latIn)) *
+                            cos(radians(p.lat)) *
+                            cos(radians(p.lng) - radians(:lngIn)) +
+                            sin(radians(:latIn)) *
+                            sin(radians(p.lat))
+                        )
+                    ) as distanceKm
+                FROM PickupPoint p
+                ORDER BY distanceKm
+                LIMIT 1
+            """)
+    PickupPointProjection findNearest(
+            @Param("latIn") double lat,
+            @Param("lngIn") double lng
+    );
+
+
 }

@@ -33,3 +33,5 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+ozon-service/src/main/resources/secrets.properties
