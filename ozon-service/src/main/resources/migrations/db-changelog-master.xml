@@ -10,4 +10,7 @@
     <changeSet id="1773357402-test-data-pickpoint" author="dllnnx">
         <sqlFile path="1773357402-test-data-pickpoint.sql" relativeToChangelogFile="true"/>
     </changeSet>
+    <changeSet id="1773438282-create_order_table" author="dllnnx">
+        <sqlFile path="1773438282-create_order_table.sql" relativeToChangelogFile="true"/>
+    </changeSet>
 </databaseChangeLog>
