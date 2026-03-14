@@ -49,7 +49,7 @@ services:
     environment:
       - DATABASE_HOST=db-ozon
       - DATABASE_PORT=5432
-      - PAYMENT_SERVICE_URL=payment-service:8081
+      - PAYMENT_SERVICE_URL=http://payment-service:8081
     ports:
       - 8080:8080
       - 9090:9090

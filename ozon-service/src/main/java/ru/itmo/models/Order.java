@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.UUID;
 
@@ -24,7 +26,8 @@ public class Order {
     private UUID paymentId;
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(columnDefinition = "order_status")
     private OrderStatus orderStatus;
 
     @Column

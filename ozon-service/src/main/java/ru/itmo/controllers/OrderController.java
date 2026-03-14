@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.itmo.dto.requests.CreateOrderRequest;
-import ru.itmo.dto.requests.DeliveryPriceRequest;
 import ru.itmo.dto.responses.CreateOrderResponse;
-import ru.itmo.dto.responses.DeliveryPriceResponse;
 import ru.itmo.services.OrderService;
 
 @RestController
@@ -38,7 +36,8 @@ public class OrderController {
                                     value = """
                                             {
                                                "pickup_point_id": "1",
-                                               "delivery_address": "Кронверкский проспект, 49"
+                                               "delivery_address": "Кронверкский проспект, 49",
+                                               "amount_kopecks": "100000"
                                              }
                                             """
                             )

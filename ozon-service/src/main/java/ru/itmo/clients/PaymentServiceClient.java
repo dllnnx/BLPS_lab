@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.itmo.dto.requests.CreatePaymentRequest;
 import ru.itmo.dto.responses.CreatePaymentResponse;
-import ru.itmo.models.Payment;
+import ru.itmo.dto.responses.PaymentStatusResponse;
 
 import java.util.UUID;
 
@@ -17,7 +17,11 @@ public class PaymentServiceClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public CreatePaymentResponse createPayment(CreatePaymentRequest payment) {
-        return restTemplate.postForObject(paymentServiceUrl + "/payment", payment, CreatePaymentResponse.class);
+    public CreatePaymentResponse createPayment(CreatePaymentRequest request) {
+        return restTemplate.postForObject(paymentServiceUrl + "/api/payment", request, CreatePaymentResponse.class);
+    }
+
+    public PaymentStatusResponse getPaymentStatus(UUID paymentId) {
+        return restTemplate.getForObject(paymentServiceUrl + "/api/payment/" + paymentId, PaymentStatusResponse.class);
     }
 }
