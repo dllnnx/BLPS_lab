@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +45,7 @@ public class OrderController {
                     )
             )
     )
-    public CreateOrderResponse calculate(@Valid @RequestBody CreateOrderRequest request) {
-        return orderService.createOrder(request);
+    public CreateOrderResponse calculate(@AuthenticationPrincipal User user, @Valid @RequestBody CreateOrderRequest request) {
+        return orderService.createOrder(user, request);
     }
 }

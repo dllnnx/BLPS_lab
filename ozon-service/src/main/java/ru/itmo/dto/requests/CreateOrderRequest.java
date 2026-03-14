@@ -16,7 +16,6 @@ public class CreateOrderRequest {
     private String deliveryAddress;
 
     @NotNull
-    @DecimalMin("0.0")
-    @DecimalMax("10000000.0") // 10M
-    private BigDecimal totalPrice;
+    @Min(0)
+    private Long amountKopecks;
 }
