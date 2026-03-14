@@ -35,3 +35,4 @@ build/
 .DS_Store
 
 ozon-service/src/main/resources/secrets.properties
+.metals

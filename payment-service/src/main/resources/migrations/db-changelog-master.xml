@@ -4,4 +4,11 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet id="1773445033-create-payments-and-card" author="dllnnx">
+        <sqlFile path="1773445033-create-payments-and-card.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="1773445034-insert-test-card" author="dllnnx">
+        <sqlFile path="1773445034-insert-test-card.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
 </databaseChangeLog>

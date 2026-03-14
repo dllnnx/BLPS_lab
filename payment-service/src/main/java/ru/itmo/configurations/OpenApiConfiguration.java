@@ -15,11 +15,11 @@ public class OpenApiConfiguration {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .servers(List.of(new Server().url("http://localhost:8080")))
+                .servers(List.of(new Server().url("http://localhost:8081")))
                 .info(new Info()
-                        .title("Ozon")
+                        .title("Payment Service")
                         .version("1.0")
-                        .description("БЛПС лабораторная работа 1"))
+                        .description("Bank transactions API"))
                 .components(new io.swagger.v3.oas.models.Components()
                         .addSecuritySchemes("basicScheme",
                                 new SecurityScheme()
