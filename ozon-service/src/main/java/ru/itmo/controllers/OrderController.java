@@ -8,13 +8,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.itmo.dto.requests.CreateOrderRequest;
 import ru.itmo.dto.responses.CreateOrderResponse;
+import ru.itmo.dto.responses.OrderResponse;
 import ru.itmo.services.OrderService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/order")
@@ -46,5 +46,14 @@ public class OrderController {
     )
     public CreateOrderResponse calculate(@AuthenticationPrincipal User user, @Valid @RequestBody CreateOrderRequest request) {
         return orderService.createOrder(user, request);
+    }
+
+    @GetMapping
+    @Operation(
+            summary = "Список заказов",
+            description = "Список заказов текущего пользователя"
+    )
+    public List<OrderResponse> getOrders(@AuthenticationPrincipal User user){
+        return orderService.getOrders(user);
     }
 }
