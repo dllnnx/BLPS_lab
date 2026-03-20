@@ -41,8 +41,8 @@ services:
 
   ozon-service:
     build:
-      context: ./ozon-service
-      dockerfile: ./ozon-service/Dockerfile
+      context: .
+      dockerfile: ./ozon.Dockerfile
     depends_on:
       db-ozon:
         condition: service_healthy
@@ -58,8 +58,8 @@ services:
 
   payment-service:
     build:
-      context: ./payment-service
-      dockerfile: ./payment-service/Dockerfile
+      context: .
+      dockerfile: ./payment-service.Dockerfile
     depends_on:
       db-payment-service:
         condition: service_healthy
