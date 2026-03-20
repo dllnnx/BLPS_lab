@@ -15,7 +15,10 @@ public class OpenApiConfiguration {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .servers(List.of(new Server().url("http://localhost:8081")))
+                .servers(List.of(
+                        new Server().url("http://localhost:8081"),
+                        new Server().url("http://46.21.246.223:8081")
+                ))
                 .info(new Info()
                         .title("Payment Service")
                         .version("1.0")

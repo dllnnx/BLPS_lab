@@ -15,7 +15,10 @@ public class OpenApiConfiguration {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .servers(List.of(new Server().url("http://localhost:8080")))
+                .servers(List.of(
+                        new Server().url("http://localhost:8080"),
+                        new Server().url("http://46.21.246.223:8080")
+                        ))
                 .info(new Info()
                         .title("Ozon")
                         .version("1.0")
