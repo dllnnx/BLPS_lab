@@ -5,7 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 import ru.itmo.clients.PaymentServiceClient;
 import ru.itmo.dto.requests.CreateOrderRequest;
 import ru.itmo.dto.requests.CreatePaymentRequest;
@@ -33,7 +33,7 @@ public class OrderService {
     public CreateOrderResponse createOrder(User user, CreateOrderRequest request) {
 
         PickupPoint pickupPoint = pickupPointRepository.findById(request.getPickupPointId())
-                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Pickup point not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pickup point not found"));
 
 
         UUID paymentId = paymentServiceClient.createPayment(new CreatePaymentRequest(request.getAmountKopecks())).getPaymentId();
