@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.itmo.dto.requests.NearestPickupPointRequest;
-import ru.itmo.dto.responses.PickupPointResponse;
+import ru.itmo.dto.responses.PickupPointWithDistanceResponse;
 import ru.itmo.services.PickupPointService;
 
 @RestController
@@ -45,7 +45,7 @@ public class PickupPointController {
                     )
             )
     )
-    public Page<PickupPointResponse> findNearest(@Valid @RequestBody NearestPickupPointRequest request) {
+    public Page<PickupPointWithDistanceResponse> findNearest(@Valid @RequestBody NearestPickupPointRequest request) {
         return service.findNearest(request);
     }
 }

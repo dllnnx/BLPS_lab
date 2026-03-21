@@ -14,5 +14,4 @@ public class PickupPointResponse {
     private String city;
     private Double lat;
     private Double lng;
-    private Double distanceKm;
 }

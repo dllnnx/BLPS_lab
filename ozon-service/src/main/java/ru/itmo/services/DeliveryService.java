@@ -2,15 +2,13 @@ package ru.itmo.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.itmo.clients.GeocoderClient;
 import ru.itmo.dto.middleware.Coordinates;
 import ru.itmo.dto.requests.DeliveryPriceRequest;
-import ru.itmo.dto.requests.NearestPickupPointRequest;
 import ru.itmo.dto.responses.DeliveryPriceResponse;
-import ru.itmo.dto.responses.PickupPointResponse;
+import ru.itmo.dto.responses.PickupPointWithDistanceResponse;
 import ru.itmo.repositories.PickupPointRepository;
 
 import java.math.BigDecimal;
@@ -46,7 +44,7 @@ public class DeliveryService {
         return new DeliveryPriceResponse(
                 request.getAddress(),
                 BigDecimal.valueOf(nearestPickPoint.getDistanceKm()).multiply(DISTANCE_COEFFICIENT),
-                new PickupPointResponse(
+                new PickupPointWithDistanceResponse(
                         nearestPickPoint.getId(),
                         nearestPickPoint.getAddress(),
                         nearestPickPoint.getCity(),

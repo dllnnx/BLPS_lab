@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.itmo.dto.requests.NearestPickupPointRequest;
-import ru.itmo.dto.responses.PickupPointResponse;
+import ru.itmo.dto.responses.PickupPointWithDistanceResponse;
 import ru.itmo.models.projections.PickupPointProjection;
 import ru.itmo.repositories.PickupPointRepository;
 
@@ -15,7 +15,7 @@ import ru.itmo.repositories.PickupPointRepository;
 public class PickupPointService {
     private final PickupPointRepository pickupPointRepository;
 
-    public Page<PickupPointResponse> findNearest(NearestPickupPointRequest request) {
+    public Page<PickupPointWithDistanceResponse> findNearest(NearestPickupPointRequest request) {
 
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
 
@@ -26,7 +26,7 @@ public class PickupPointService {
                 pageable
         );
 
-        return page.map(p -> new PickupPointResponse(
+        return page.map(p -> new PickupPointWithDistanceResponse(
                 p.getId(),
                 p.getAddress(),
                 p.getCity(),

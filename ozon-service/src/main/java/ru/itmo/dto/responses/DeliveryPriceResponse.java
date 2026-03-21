@@ -10,5 +10,5 @@ import java.math.BigDecimal;
 public class DeliveryPriceResponse {
     private String address;
     private BigDecimal price;
-    private PickupPointResponse nearestPickupPoint;
+    private PickupPointWithDistanceResponse nearestPickupPoint;
 }
