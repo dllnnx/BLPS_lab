@@ -16,6 +16,7 @@ public class OpenApiConfiguration {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .servers(List.of(
+                        new Server().url("/"),
                         new Server().url("http://localhost:8080"),
                         new Server().url("http://46.21.246.223:8080")
                         ))
