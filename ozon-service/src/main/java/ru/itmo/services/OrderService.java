@@ -5,6 +5,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 import ru.itmo.clients.PaymentServiceClient;
 import ru.itmo.dto.requests.CreateOrderRequest;
@@ -30,21 +32,36 @@ public class OrderService {
     private final PaymentServiceClient paymentServiceClient;
     private final ModelMapper modelMapper;
 
+    @Transactional
     public CreateOrderResponse createOrder(User user, CreateOrderRequest request) {
 
         PickupPoint pickupPoint = pickupPointRepository.findById(request.getPickupPointId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pickup point not found"));
 
-
-        UUID paymentId = paymentServiceClient.createPayment(new CreatePaymentRequest(request.getAmountKopecks())).getPaymentId();
         Order order = orderRepository.save(new Order(
                 null,
-                paymentId,
+                null,
                 OrderStatus.NEW,
                 user.getUsername(),
                 pickupPoint,
                 request.getDeliveryAddress()
         ));
+        UUID paymentId;
+
+        try {
+            paymentId = paymentServiceClient.createPayment(
+                    new CreatePaymentRequest(request.getAmountKopecks())
+            ).getPaymentId();
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Failed to create order, please try later"
+            );
+        }
+
+        order.setPaymentId(paymentId);
+        orderRepository.save(order);
+
         return new CreateOrderResponse(paymentId);
     }
 

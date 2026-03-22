@@ -22,15 +22,15 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(name = "payment_id")
     private UUID paymentId;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(columnDefinition = "order_status")
+    @Column(columnDefinition = "order_status", name = "order_status")
     private OrderStatus orderStatus;
 
-    @Column
+    @Column(name = "username")
     private String username;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
