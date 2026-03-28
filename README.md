@@ -29,5 +29,7 @@ Boot.
 Находится по ссылке http://localhost:8080/swagger-ui/index.html
 
 # BPMN
-
+## lab1
 ![bpmn.png](img/diagram.svg)
+## lab2
+![bpmn2.png](img/diagram_lab2.svg)
