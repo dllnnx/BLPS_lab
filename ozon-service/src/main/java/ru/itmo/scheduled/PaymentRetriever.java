@@ -32,10 +32,12 @@ public class PaymentRetriever {
                 order.setOrderStatus(OrderStatus.PAYMENT_ERROR);
                 orderRepository.save(order);
                 log.info("Payment failed: {}", order.getPaymentId());
-            } else if (paymentStatusResponse.getStatus() == PaymentStatus.COMPLETED){
+            } else if (paymentStatusResponse.getStatus() == PaymentStatus.COMPLETED) {
                 order.setOrderStatus(OrderStatus.PAID);
                 orderRepository.save(order);
                 log.info("Payment completed: {}", order.getPaymentId());
+            } else if (paymentStatusResponse.getStatus() == PaymentStatus.INVALID) {
+                log.debug("Payment invalidated (order may be cancelled): {}", order.getPaymentId());
             } else {
                 log.info("Payment is pending: {}", order.getPaymentId());
             }

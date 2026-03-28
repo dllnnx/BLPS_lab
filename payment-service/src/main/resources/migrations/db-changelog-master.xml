@@ -10,5 +10,8 @@
     <changeSet id="1773445034-insert-test-card" author="dllnnx">
         <sqlFile path="1773445034-insert-test-card.sql" relativeToChangelogFile="true"/>
     </changeSet>
+    <changeSet id="1774000000-payment-status-invalid" author="blps" runInTransaction="false">
+        <sqlFile path="1774000000-payment-status-invalid.sql" relativeToChangelogFile="true"/>
+    </changeSet>
 
 </databaseChangeLog>
