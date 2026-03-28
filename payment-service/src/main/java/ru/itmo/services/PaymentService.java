@@ -41,7 +41,7 @@ public class PaymentService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found"));
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(noRollbackFor = ResponseStatusException.class)
     public void pay(PayRequest request) {
         Payment payment = paymentRepository.findById(request.getPaymentId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found"));

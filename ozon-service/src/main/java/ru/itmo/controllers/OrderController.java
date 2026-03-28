@@ -71,7 +71,7 @@ public class OrderController {
     @Operation(summary = "Отмена заказа", description = "Доступно для заказа в статусе ошибки оплаты; платёж переводится в INVALID")
     public ResponseEntity<Void> cancelOrder(
             @AuthenticationPrincipal AppUserPrincipal user,
-            @PathVariable Long orderId
+            @PathVariable("orderId") Long orderId
     ) {
         orderService.cancelOwnOrder(orderId, user);
         return ResponseEntity.noContent().build();
@@ -82,7 +82,7 @@ public class OrderController {
     @Operation(summary = "Выдача заказа в ПВЗ", description = "Перевод из PAID в ISSUED для заказа своего ПВЗ")
     public ResponseEntity<Void> markIssued(
             @AuthenticationPrincipal AppUserPrincipal user,
-            @PathVariable Long orderId
+            @PathVariable("orderId") Long orderId
     ) {
         orderService.markIssuedAtPickup(orderId, user);
         return ResponseEntity.noContent().build();
@@ -92,7 +92,7 @@ public class OrderController {
     @PreAuthorize("hasAuthority('ORDER_UPDATE_ALL')")
     @Operation(summary = "Изменение статуса заказа (админ)", description = "Произвольная смена статуса заказа")
     public ResponseEntity<Void> updateStatusAdmin(
-            @PathVariable Long orderId,
+            @PathVariable("orderId") Long orderId,
             @Valid @RequestBody UpdateOrderStatusRequest request
     ) {
         orderService.updateOrderStatusByAdmin(orderId, request.getOrderStatus());

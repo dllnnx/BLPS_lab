@@ -58,4 +58,8 @@ public class AppUserPrincipal implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public Long getPickupPointId() {
+        return pickupPointId;
+    }
 }
