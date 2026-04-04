@@ -13,4 +13,7 @@
     <changeSet id="1773438282-create_order_table" author="dllnnx">
         <sqlFile path="1773438282-create_order_table.sql" relativeToChangelogFile="true"/>
     </changeSet>
+    <changeSet id="1774000000-order-status-and-auth" author="blps" runInTransaction="false">
+        <sqlFile path="1774000000-order-status-and-auth.sql" relativeToChangelogFile="true"/>
+    </changeSet>
 </databaseChangeLog>

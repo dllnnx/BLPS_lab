@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
+import ru.itmo.security.AppUserPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +24,7 @@ public class HelloWorldController {
     @GetMapping("/me")
     @Operation(summary = "Текущий пользователь", description = "Возвращает username текущего пользователя")
     // note: так же можно воспользоваться SecurityContextHolder.getContext().getAuthentication().getName();
-    public ResponseEntity<String> me(@AuthenticationPrincipal User user ) {
+    public ResponseEntity<String> me(@AuthenticationPrincipal AppUserPrincipal user) {
         return ResponseEntity.ok(user.getUsername());
     }
 }

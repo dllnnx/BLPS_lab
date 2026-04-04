@@ -52,6 +52,13 @@ public class PaymentController {
         return response;
     }
 
+    @DeleteMapping("/{paymentId}")
+    @Operation(summary = "Инвалидация платежа", description = "Перевод FAILED → INVALID (отмена заказа)")
+    public ResponseEntity<Void> invalidatePayment(@PathVariable("paymentId") UUID paymentId) {
+        paymentService.invalidatePayment(paymentId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/pay")
     @Operation(
             summary = "Оплатить счет",

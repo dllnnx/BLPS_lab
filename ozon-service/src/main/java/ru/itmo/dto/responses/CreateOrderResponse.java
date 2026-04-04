@@ -8,5 +8,6 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 public class CreateOrderResponse {
-    UUID paymentId;
+    private Long orderId;
+    private UUID paymentId;
 }

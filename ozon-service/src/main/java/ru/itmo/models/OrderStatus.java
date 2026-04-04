@@ -3,5 +3,7 @@ package ru.itmo.models;
 public enum OrderStatus {
     NEW,
     PAID,
-    PAYMENT_ERROR
+    PAYMENT_ERROR,
+    CANCELLED,
+    ISSUED
 }

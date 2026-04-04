@@ -15,6 +15,6 @@ RUN mvn package -pl ozon-service -am -DskipTests --no-transfer-progress
 FROM amazoncorretto:17-alpine
 WORKDIR /app
 
-COPY --from=build /app/ozon-service/target/ozon.jar ./ozon.jar
+COPY --from=build /app/ozon-service/target/ozon.war ./ozon.war
 
-ENTRYPOINT java -jar ./ozon.jar
+ENTRYPOINT java -jar ./ozon.war
