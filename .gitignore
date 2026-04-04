@@ -36,3 +36,4 @@ build/
 
 ozon-service/src/main/resources/secrets.properties
 .metals
+settings.xml
