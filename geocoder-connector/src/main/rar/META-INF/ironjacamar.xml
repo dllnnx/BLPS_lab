@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ironjacamar xmlns="http://www.jboss.org/ironjacamar/schema"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.jboss.org/ironjacamar/schema http://www.jboss.org/ironjacamar/schema/resourceadapters_1_0.xsd">
+
+    <transaction-support>NoTransaction</transaction-support>
+
+    <connection-definitions>
+        <connection-definition class-name="ru.itmo.GeoManagedConnectionFactory"
+                               jndi-name="java:/eis/GeoConnectionFactory"
+                               enabled="true"
+                               use-java-context="true"
+                               pool-name="GeoConnectionPool"/>
+    </connection-definitions>
+</ironjacamar>
