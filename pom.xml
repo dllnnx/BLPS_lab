@@ -20,6 +20,7 @@
         <module>ozon-service</module>
         <module>payment-service</module>
         <module>schema-registry</module>
+        <module>geocoder-connector</module>
     </modules>
 
     <build>
