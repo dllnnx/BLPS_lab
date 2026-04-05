@@ -24,7 +24,7 @@ public class GeoManagedConnectionFactory implements ManagedConnectionFactory, Se
 
     @Override
     public Object createConnectionFactory() throws ResourceException {
-        throw new ResourceException("ConnectionFactory not supported");
+        throw new ResourceException("ConnectionFactory without manager not supported");
     }
 
     @Override

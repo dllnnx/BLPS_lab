@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import ru.itmo.Coordinates;
 import ru.itmo.GeoConnection;
 import ru.itmo.GeoConnectionFactory;
-import ru.itmo.dto.middleware.Coordinates;
 
 import java.util.List;
 import java.util.Map;

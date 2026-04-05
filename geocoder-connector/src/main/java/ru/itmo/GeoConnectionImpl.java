@@ -1,7 +1,5 @@
 package ru.itmo;
 
-import java.util.Optional;
-
 public class GeoConnectionImpl implements GeoConnection {
 
     private final GeoManagedConnection mc;

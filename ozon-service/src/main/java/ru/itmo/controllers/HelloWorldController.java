@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import ru.itmo.dto.middleware.Coordinates;
+import ru.itmo.Coordinates;
 import ru.itmo.clients.GeocoderClient;
 import ru.itmo.security.AppUserPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;

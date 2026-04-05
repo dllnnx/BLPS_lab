@@ -7,57 +7,54 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>geocoder-connector</artifactId>
-    <packaging>rar</packaging>
+    <artifactId>ozon-ear</artifactId>
+    <packaging>ear</packaging>
 
-    <name>BLPS :: Geocoder JCA</name>
+    <name>OZON :: Ozon service EAR</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-
     <dependencies>
         <dependency>
-            <groupId>jakarta.resource</groupId>
-            <artifactId>jakarta.resource-api</artifactId>
-            <version>2.1.0</version>
-            <scope>provided</scope>
+            <groupId>ru.itmo</groupId>
+            <artifactId>ozon-service</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>ru.itmo</groupId>
+            <artifactId>geocoder-connector</artifactId>
+            <version>${project.version}</version>
+            <type>rar</type>
         </dependency>
         <dependency>
             <groupId>ru.itmo</groupId>
             <artifactId>geocoder-connector-shared</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <type>jar</type>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>connector-classes-jar</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-rar-plugin</artifactId>
-                <version>3.0.0</version>
+                <artifactId>maven-ear-plugin</artifactId>
+                <version>3.4.0</version>
                 <configuration>
-                    <includeJar>true</includeJar>
-<!--                    <archive>-->
-<!--                        <manifestEntries>-->
-<!--                            <Dependencies>ru.itmo</Dependencies>-->
-<!--                        </manifestEntries>-->
-<!--                    </archive>-->
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <modules>
+                        <webModule>
+                            <groupId>ru.itmo</groupId>
+                            <artifactId>ozon-service</artifactId>
+                            <contextRoot>/ozon</contextRoot>
+                        </webModule>
+
+                        <rarModule>
+                            <groupId>ru.itmo</groupId>
+                            <artifactId>geocoder-connector</artifactId>
+                        </rarModule>
+                    </modules>
                 </configuration>
             </plugin>
             <plugin>
