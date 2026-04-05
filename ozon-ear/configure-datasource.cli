@@ -1,0 +1,23 @@
+embed-server --std-out=echo
+
+module add \
+  --name=org.postgresql \
+  --resources=/opt/jboss/wildfly/postgresql.jar
+
+/subsystem=datasources/jdbc-driver=postgres:add( \
+    driver-name=postgres, \
+    driver-module-name=org.postgresql, \
+    driver-class-name=org.postgresql.Driver)
+
+data-source add \
+  --name=OzonDS \
+  --jndi-name=java:/OzonDS \
+  --driver-name=postgres \
+  --connection-url=jdbc:postgresql://ozon-db:5432/study \
+  --user-name=study \
+  --password=study \
+  --min-pool-size=5 \
+  --max-pool-size=20 \
+  --enabled=true
+
+stop-embedded-server

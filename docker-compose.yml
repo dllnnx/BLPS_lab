@@ -55,7 +55,7 @@ services:
       - PAYMENT_SERVICE_PASSWORD=ozon-secret
     ports:
       - 8080:8080
-      - 9090:9090
+      - 9990:9990
     networks:
       - backend
 

@@ -37,6 +37,7 @@
         </dependency>
     </dependencies>
     <build>
+        <finalName>ozon-ear</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-ear-plugin</artifactId>

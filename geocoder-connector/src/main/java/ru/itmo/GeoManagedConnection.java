@@ -13,6 +13,7 @@ public class GeoManagedConnection implements ManagedConnection {
 
     private GeoService service = new GeoService();
     private Set<GeoConnectionImpl> handles = new HashSet<>();
+    private Set<ConnectionEventListener> listeners = new HashSet<>();
 
     @Override
     public Object getConnection(Subject subject,
@@ -24,24 +25,36 @@ public class GeoManagedConnection implements ManagedConnection {
 
     public void closeHandle(GeoConnectionImpl conn) {
         handles.remove(conn);
+        ConnectionEvent event =
+                new ConnectionEvent(this, ConnectionEvent.CONNECTION_CLOSED);
+        event.setConnectionHandle(conn);
+
+        for (ConnectionEventListener listener : listeners) {
+            listener.connectionClosed(event);
+        }
     }
 
     @Override
-    public void cleanup() {}
+    public void cleanup() {
+        handles.clear();
+    }
 
     @Override
     public void associateConnection(Object o) throws ResourceException {
-
+        if (o instanceof GeoConnectionImpl) {
+            GeoConnectionImpl conn = (GeoConnectionImpl) o;
+            handles.add(conn);
+        }
     }
 
     @Override
-    public void addConnectionEventListener(ConnectionEventListener connectionEventListener) {
-
+    public void addConnectionEventListener(ConnectionEventListener listener) {
+        listeners.add(listener);
     }
 
     @Override
-    public void removeConnectionEventListener(ConnectionEventListener connectionEventListener) {
-
+    public void removeConnectionEventListener(ConnectionEventListener listener) {
+        listeners.remove(listener);
     }
 
     @Override

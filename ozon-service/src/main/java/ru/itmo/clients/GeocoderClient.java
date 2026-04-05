@@ -21,14 +21,17 @@ public class GeocoderClient {
     private final GeoConnectionFactory connectionFactory;
 
     public Optional<Coordinates> getCoordinates(String address) {
+        GeoConnection conn = null;
         try {
-            GeoConnection conn = connectionFactory.getConnection();
+            conn = connectionFactory.getConnection();
             Coordinates coordinates = conn.getCoordinates(address);
             return Optional.of(new Coordinates(
                     coordinates.getLatitude(),
                     coordinates.getLongitude()
             ));
         } finally {
+            if (conn != null)
+                conn.close();
         }
     }
 
