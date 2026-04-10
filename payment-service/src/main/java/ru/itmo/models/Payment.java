@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -32,4 +31,6 @@ public class Payment {
     @Column(columnDefinition = "payment_status", nullable = false)
     private PaymentStatus status;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 }

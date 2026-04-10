@@ -1,6 +1,7 @@
 package ru.itmo.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,9 @@ import ru.itmo.producers.PaymentProducer;
 import ru.itmo.repositories.CardInfoRepository;
 import ru.itmo.repositories.PaymentRepository;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -27,14 +31,32 @@ public class PaymentService {
     private final CardInfoRepository cardInfoRepository;
     private final PaymentProducer paymentProducer;
 
+    @Value("${payment.pending-expiry.threshold-minutes:5}")
+    private int pendingExpiryThresholdMinutes;
+
     @Transactional(rollbackFor = Exception.class)
     public CreatePaymentResponse createPayment(Long amount) {
+        Instant now = Instant.now();
         Payment payment = paymentRepository.save(new Payment(
                 UUID.randomUUID(),
                 amount,
-                PaymentStatus.PENDING
+                PaymentStatus.PENDING,
+                now
         ));
         return new CreatePaymentResponse(payment.getId());
+    }
+
+    /**
+     * Платежи в PENDING старше порога ({@code payment.pending-expiry.threshold-minutes}) → FAILED (+ событие в очередь).
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public int expireStalePendingPayments() {
+        Instant threshold = Instant.now().minus(pendingExpiryThresholdMinutes, ChronoUnit.MINUTES);
+        List<Payment> stale = paymentRepository.findByStatusAndCreatedAtBefore(PaymentStatus.PENDING, threshold);
+        for (Payment p : stale) {
+            markFailed(p);
+        }
+        return stale.size();
     }
 
     @Transactional(readOnly = true)

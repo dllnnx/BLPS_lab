@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.itmo.dto.requests.PayRequest;
 import ru.itmo.dto.requests.CreatePaymentRequest;
 import ru.itmo.dto.responses.CreatePaymentResponse;
+import ru.itmo.dto.responses.ExpireStalePendingResponse;
 import ru.itmo.dto.responses.PaymentStatusResponse;
 import ru.itmo.services.PaymentService;
 
@@ -57,6 +58,16 @@ public class PaymentController {
     public ResponseEntity<Void> invalidatePayment(@PathVariable("paymentId") UUID paymentId) {
         paymentService.invalidatePayment(paymentId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/admin/expire-stale-pending")
+    @Operation(
+            summary = "Просроченные PENDING → FAILED (ручной запуск)",
+            description = "Та же логика, что у Quartz-джобы: PENDING старше порога минут переводятся в FAILED"
+    )
+    public ExpireStalePendingResponse expireStalePendingManually() {
+        int n = paymentService.expireStalePendingPayments();
+        return new ExpireStalePendingResponse(n);
     }
 
     @PostMapping("/pay")
