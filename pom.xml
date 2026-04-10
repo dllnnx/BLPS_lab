@@ -20,6 +20,9 @@
         <module>ozon-service</module>
         <module>payment-service</module>
         <module>schema-registry</module>
+        <module>geocoder-connector</module>
+        <module>geocoder-connector-shared</module>
+        <module>ozon-ear</module>
     </modules>
 
     <build>

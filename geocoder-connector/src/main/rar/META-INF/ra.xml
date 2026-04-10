@@ -1,0 +1,22 @@
+<connector xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+           version="1.7">
+
+    <resourceadapter>
+        <resourceadapter-class>ru.itmo.GeoResourceAdapter</resourceadapter-class>
+
+        <outbound-resourceadapter>
+            <connection-definition>
+                <managedconnectionfactory-class>ru.itmo.GeoManagedConnectionFactory</managedconnectionfactory-class>
+
+                <connectionfactory-interface>ru.itmo.GeoConnectionFactory</connectionfactory-interface>
+
+                <connectionfactory-impl-class>ru.itmo.GeoConnectionFactoryImpl</connectionfactory-impl-class>
+
+                <connection-interface>ru.itmo.GeoConnection</connection-interface>
+
+                <connection-impl-class>ru.itmo.GeoConnectionImpl</connection-impl-class>
+            </connection-definition>
+        </outbound-resourceadapter>
+
+    </resourceadapter>
+</connector>

@@ -1,0 +1,74 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ru.itmo</groupId>
+        <artifactId>BLPS_lab1</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>ozon-ear</artifactId>
+    <packaging>ear</packaging>
+
+    <name>OZON :: Ozon service EAR</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>ru.itmo</groupId>
+            <artifactId>ozon-service</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>ru.itmo</groupId>
+            <artifactId>geocoder-connector</artifactId>
+            <version>${project.version}</version>
+            <type>rar</type>
+        </dependency>
+        <dependency>
+            <groupId>ru.itmo</groupId>
+            <artifactId>geocoder-connector-shared</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>ozon-ear</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-ear-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <modules>
+                        <webModule>
+                            <groupId>ru.itmo</groupId>
+                            <artifactId>ozon-service</artifactId>
+                            <contextRoot>/ozon</contextRoot>
+                        </webModule>
+
+                        <rarModule>
+                            <groupId>ru.itmo</groupId>
+                            <artifactId>geocoder-connector</artifactId>
+                        </rarModule>
+                    </modules>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>4.2.0.Final</version>
+                <configuration>
+                    <hostname>localhost</hostname>
+                    <port>9990</port>
+                    <username>admin</username>
+                    <password>admin</password>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
