@@ -53,6 +53,7 @@ services:
       - PAYMENT_SERVICE_URL=http://payment-service:8081
       - PAYMENT_SERVICE_USERNAME=ozon-integration
       - PAYMENT_SERVICE_PASSWORD=ozon-secret
+      - YANDEX_MAPS_API_KEY=${YANDEX_MAPS_API_KEY}
     ports:
       - 8080:8080
       - 9990:9990
