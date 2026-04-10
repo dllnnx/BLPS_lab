@@ -33,3 +33,5 @@ Boot.
 ![bpmn.png](img/diagram.svg)
 ## lab2
 ![bpmn2.png](img/diagram_lab2.svg)
+## lab3
+![bpmn3.png](img/diagram_lab3.svg)
