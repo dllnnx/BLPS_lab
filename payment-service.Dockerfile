@@ -4,6 +4,9 @@ WORKDIR /app
 
 COPY pom.xml .
 COPY ozon-service/pom.xml ozon-service/
+COPY geocoder-connector/pom.xml geocoder-connector/
+COPY geocoder-connector-shared/pom.xml geocoder-connector-shared/
+COPY ozon-ear/pom.xml ozon-ear/
 COPY payment-service/pom.xml payment-service/
 COPY schema-registry/pom.xml schema-registry/
 RUN mvn dependency:go-offline -pl payment-service -am -B --no-transfer-progress
