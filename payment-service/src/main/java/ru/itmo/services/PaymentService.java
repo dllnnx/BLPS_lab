@@ -46,9 +46,6 @@ public class PaymentService {
         return new CreatePaymentResponse(payment.getId());
     }
 
-    /**
-     * Платежи в PENDING старше порога ({@code payment.pending-expiry.threshold-minutes}) → FAILED (+ событие в очередь).
-     */
     @Transactional(rollbackFor = Exception.class)
     public int expireStalePendingPayments() {
         Instant threshold = Instant.now().minus(pendingExpiryThresholdMinutes, ChronoUnit.MINUTES);

@@ -23,9 +23,7 @@ public class QuartzConfiguration {
                 .build();
     }
 
-    /**
-     * Каждую минуту в 0 секунд (Quartz cron: сек мин час день месяц день-недели).
-     */
+
     @Bean
     public Trigger pendingPaymentExpiryTrigger(JobDetail pendingPaymentExpiryJobDetail) {
         return TriggerBuilder.newTrigger()

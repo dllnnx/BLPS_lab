@@ -8,9 +8,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import ru.itmo.services.PaymentService;
 
-/**
- * Quartz: раз в минуту помечаем просроченные PENDING как FAILED.
- */
 @Slf4j
 @DisallowConcurrentExecution
 public class PendingPaymentExpiryJob extends QuartzJobBean {
