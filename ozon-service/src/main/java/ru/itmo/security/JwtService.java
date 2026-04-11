@@ -115,13 +115,13 @@ public class JwtService {
 
     public static class JwtRevokedException extends RuntimeException {
         public JwtRevokedException() {
-            super("Token was revoked (e.g. used from a different IP)");
+            super("Token was revoked (used from a different IP)");
         }
     }
 
     public static class JwtIpMismatchException extends RuntimeException {
         public JwtIpMismatchException(String bound, String current) {
-            super("Token was issued for IP " + bound + " but request is from " + current + "; token revoked");
+            super("Token was issued for IP " + bound + " but request is from " + current);
         }
     }
 }

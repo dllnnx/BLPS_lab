@@ -4,9 +4,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Отзыв JWT после нарушения привязки к IP: токен с этим jti больше не принимается до истечения срока.
- */
 @Service
 public class JwtBlacklistService {
 

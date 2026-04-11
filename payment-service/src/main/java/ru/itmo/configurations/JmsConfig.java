@@ -12,14 +12,6 @@ import org.springframework.jms.support.converter.MappingJackson2MessageConverter
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 
-/**
- * JMS к брокеру Apache ActiveMQ Classic по протоколу <strong>OpenWire</strong> (Java OpenWire transport).
- * <p>
- * URI {@code tcp://host:port} — TCP + OpenWire; параметры {@code wireFormat.*} в URL настраивают именно OpenWire.
- * </p>
- *
- * @see <a href="https://activemq.apache.org/components/classic/documentation/openwire">OpenWire</a>
- */
 @Slf4j
 @Configuration
 public class JmsConfig {

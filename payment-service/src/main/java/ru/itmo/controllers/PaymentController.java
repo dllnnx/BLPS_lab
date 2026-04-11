@@ -63,7 +63,7 @@ public class PaymentController {
     @PostMapping("/admin/expire-stale-pending")
     @Operation(
             summary = "Просроченные PENDING → FAILED (ручной запуск)",
-            description = "Та же логика, что у Quartz-джобы: PENDING старше порога минут переводятся в FAILED"
+            description = "платежи, находящиеся в статусе PENDING дольше пяти минут, переводятся в статус FAILED"
     )
     public ExpireStalePendingResponse expireStalePendingManually() {
         int n = paymentService.expireStalePendingPayments();
