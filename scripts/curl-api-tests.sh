@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 # Скрипт проверки публичных HTTP-интерфейсов (OZON + payment).
-# Запуск: из корня репозитория — bash scripts/curl-api-tests.sh
-# Опционально: OZON_URL, PAYMENT_URL, PAYMENT_SERVICE_USERNAME, PAYMENT_SERVICE_PASSWORD
+# OZON: сначала POST /api/auth/login → JWT Bearer (роли режутся по сетевым политикам и IP).
+# Опционально MOCK_CLIENT_IP — заголовок X-Client-IP (см. app.security.use-client-ip-header).
 #
-# Учётки OZON (Basic): user1 / ppadmin / superadmin, пароль везде: password
-# Учётка вызова payment API: ozon-integration / ozon-secret (как у ozon-service)
+# Переменные: OZON_URL, PAYMENT_URL, PAYMENT_SERVICE_*, MOCK_CLIENT_IP
 
 set -euo pipefail
 
@@ -13,32 +12,54 @@ PAY="${PAYMENT_URL:-http://localhost:8081}"
 PAY_USER="${PAYMENT_SERVICE_USERNAME:-ozon-integration}"
 PAY_PASS="${PAYMENT_SERVICE_PASSWORD:-ozon-secret}"
 
+ozon_login_json() {
+  local user="$1" pass="$2"
+  local args=(-sS -X POST "${OZON}/api/auth/login" -H "Content-Type: application/json")
+  if [[ -n "${MOCK_CLIENT_IP:-}" ]]; then
+    args+=(-H "X-Client-IP: ${MOCK_CLIENT_IP}")
+  fi
+  args+=(-d "{\"username\":\"${user}\",\"password\":\"${pass}\"}")
+  curl "${args[@]}"
+}
+
+require_jq() {
+  if ! command -v jq >/dev/null 2>&1; then
+    echo "Нужен jq для разбора JSON и токена" >&2
+    exit 1
+  fi
+}
+
+require_jq
+
 echo "=== OZON: публичный ping (без авторизации) ==="
 curl -sS "${OZON}/api/public/ping"
 echo
 
-echo "=== OZON: текущий пользователь (user1) ==="
-curl -sS -u 'user1:password' "${OZON}/api/me"
+echo "=== OZON: логин user1 → JWT ==="
+LOGIN_U1=$(ozon_login_json user1 password)
+echo "${LOGIN_U1}" | jq .
+TOKEN_U1=$(echo "${LOGIN_U1}" | jq -r '.accessToken // empty')
+if [[ -z "${TOKEN_U1}" ]]; then
+  echo "Логин user1 не удался" >&2
+  exit 1
+fi
+
+echo "=== OZON: текущий пользователь (user1, Bearer) ==="
+curl -sS -H "Authorization: Bearer ${TOKEN_U1}" "${OZON}/api/me"
 echo
 
 echo "=== OZON: создание заказа (user1) ==="
-CREATE_JSON=$(curl -sS -u 'user1:password' -X POST "${OZON}/api/order" \
+CREATE_JSON=$(curl -sS -H "Authorization: Bearer ${TOKEN_U1}" -X POST "${OZON}/api/order" \
   -H 'Content-Type: application/json' \
   -d '{"pickup_point_id":1,"delivery_address":"Тестовый адрес","amount_kopecks":10000}')
 echo "${CREATE_JSON}"
 
-ORDER_ID=""
-PAYMENT_ID=""
-if command -v jq >/dev/null 2>&1; then
-  ORDER_ID=$(echo "${CREATE_JSON}" | jq -r '.orderId // empty')
-  PAYMENT_ID=$(echo "${CREATE_JSON}" | jq -r '.paymentId // empty')
-  echo "orderId=${ORDER_ID} paymentId=${PAYMENT_ID}"
-else
-  echo "(установите jq, чтобы автоматически вытащить orderId/paymentId из JSON)"
-fi
+ORDER_ID=$(echo "${CREATE_JSON}" | jq -r '.orderId // empty')
+PAYMENT_ID=$(echo "${CREATE_JSON}" | jq -r '.paymentId // empty')
+echo "orderId=${ORDER_ID} paymentId=${PAYMENT_ID}"
 
 echo "=== OZON: список заказов (user1) ==="
-curl -sS -u 'user1:password' "${OZON}/api/order"
+curl -sS -H "Authorization: Bearer ${TOKEN_U1}" "${OZON}/api/order"
 echo
 
 echo "=== PAYMENT: статус платежа (интеграционный Basic) ==="
@@ -66,10 +87,10 @@ if [[ -n "${ORDER_ID}" ]]; then
   echo "sleep 65..."
   sleep 65
   echo "Список заказов после опроса payment:"
-  curl -sS -u 'user1:password' "${OZON}/api/order"
+  curl -sS -H "Authorization: Bearer ${TOKEN_U1}" "${OZON}/api/order"
   echo
   echo "=== OZON: отмена заказа DELETE (только из PAYMENT_ERROR) ==="
-  curl -sS -o /dev/null -w "HTTP %{http_code}\n" -u 'user1:password' -X DELETE "${OZON}/api/order/${ORDER_ID}" || true
+  curl -sS -o /dev/null -w "HTTP %{http_code}\n" -H "Authorization: Bearer ${TOKEN_U1}" -X DELETE "${OZON}/api/order/${ORDER_ID}" || true
   echo
 fi
 
@@ -78,10 +99,7 @@ PAY_NEW=$(curl -sS -u "${PAY_USER}:${PAY_PASS}" -X POST "${PAY}/api/payment" \
   -H 'Content-Type: application/json' \
   -d '{"amountKopecks":5000}')
 echo "${PAY_NEW}"
-PID_OK=""
-if command -v jq >/dev/null 2>&1; then
-  PID_OK=$(echo "${PAY_NEW}" | jq -r '.paymentId // empty')
-fi
+PID_OK=$(echo "${PAY_NEW}" | jq -r '.paymentId // empty')
 if [[ -n "${PID_OK}" ]]; then
   curl -sS -o /dev/null -w "pay HTTP %{http_code}\n" -u "${PAY_USER}:${PAY_PASS}" -X POST "${PAY}/api/payment/pay" \
     -H 'Content-Type: application/json' \
@@ -90,14 +108,20 @@ if [[ -n "${PID_OK}" ]]; then
   echo
 fi
 
+echo "=== OZON: логин ppadmin → JWT ==="
+TOKEN_PP=$(ozon_login_json ppadmin password | jq -r '.accessToken // empty')
 echo "=== OZON: заказы по ПВЗ (ppadmin) ==="
-curl -sS -u 'ppadmin:password' "${OZON}/api/order"
+curl -sS -H "Authorization: Bearer ${TOKEN_PP}" "${OZON}/api/order"
 echo
 
+echo "=== OZON: логин superadmin → JWT ==="
+TOKEN_AD=$(ozon_login_json superadmin password | jq -r '.accessToken // empty')
 echo "=== OZON: все заказы (superadmin) ==="
-curl -sS -u 'superadmin:password' "${OZON}/api/order"
+curl -sS -H "Authorization: Bearer ${TOKEN_AD}" "${OZON}/api/order"
 echo
 
 echo "=== Готово ==="
-echo "Ручки вручную: PATCH ${OZON}/api/order/{id}/issue (ppadmin, PAID→ISSUED)"
-echo "               PATCH ${OZON}/api/order/{id}/status (superadmin, тело {\"orderStatus\":\"NEW\"|...})"
+echo "Демо RBAC/CIDR: пользователь netdemo (роли USER+PICKUP+ADMIN), пароль password:"
+echo "  MOCK_CLIENT_IP=173.0.0.5 $0   # ожидаемо только USER в effectiveRoles"
+echo "  MOCK_CLIENT_IP=173.12.34.56 $0 # USER+PICKUP (маска /8 побеждает /0)"
+echo "Ручки: PATCH ${OZON}/api/order/{id}/issue (ppadmin), PATCH .../status (superadmin)"

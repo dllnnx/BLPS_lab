@@ -16,4 +16,7 @@
     <changeSet id="1774000000-order-status-and-auth" author="blps" runInTransaction="false">
         <sqlFile path="1774000000-order-status-and-auth.sql" relativeToChangelogFile="true"/>
     </changeSet>
+    <changeSet id="1774000002-network-policies" author="blps">
+        <sqlFile path="1774000002-network-policies.sql" relativeToChangelogFile="true"/>
+    </changeSet>
 </databaseChangeLog>

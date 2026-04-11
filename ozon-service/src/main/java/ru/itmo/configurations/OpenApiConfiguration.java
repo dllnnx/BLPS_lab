@@ -21,10 +21,12 @@ public class OpenApiConfiguration {
                         .version("1.0")
                         .description("БЛПС лабораторная работа 1"))
                 .components(new io.swagger.v3.oas.models.Components()
-                        .addSecuritySchemes("basicScheme",
+                        .addSecuritySchemes("bearerScheme",
                                 new SecurityScheme()
                                         .type(SecurityScheme.Type.HTTP)
-                                        .scheme("basic")))
-                .addSecurityItem(new SecurityRequirement().addList("basicScheme"));
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                                        .description("Токен из POST /api/auth/login; привязан к IP клиента")))
+                .addSecurityItem(new SecurityRequirement().addList("bearerScheme"));
     }
 }
