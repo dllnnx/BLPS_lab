@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-/**
- * Определение «клиентского» IP: опциональный доверенный заголовок (подмена для тестов),
- * затем X-Forwarded-For (первый hop), иначе remoteAddr.
- */
+
 @Component
 public class ClientIpResolver {
 

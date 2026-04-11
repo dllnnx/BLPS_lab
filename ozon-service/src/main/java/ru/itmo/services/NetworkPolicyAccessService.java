@@ -11,9 +11,6 @@ import ru.itmo.security.CidrUtils;
 
 import java.util.*;
 
-/**
- * Вычисление эффективных ролей по IPv4 и сетевым политикам (наибольшая маска / длина префикса побеждает).
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor

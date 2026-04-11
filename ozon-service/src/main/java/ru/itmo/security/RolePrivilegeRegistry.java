@@ -13,19 +13,6 @@ public final class RolePrivilegeRegistry {
             "ADMIN", List.of("ORDER_VIEW_ALL", "ORDER_UPDATE_ALL")
     );
 
-    private RolePrivilegeRegistry() {
-    }
-
-    public static Collection<? extends GrantedAuthority> authoritiesForRoles(Collection<String> roleNames) {
-        Set<GrantedAuthority> out = new LinkedHashSet<>();
-        for (String role : roleNames) {
-            for (String p : ROLE_PRIVILEGES.getOrDefault(role, List.of())) {
-                out.add(new SimpleGrantedAuthority(p));
-            }
-        }
-        return out;
-    }
-
     public static Set<String> privilegeNamesForRoles(Collection<String> roleNames) {
         Set<String> out = new LinkedHashSet<>();
         for (String role : roleNames) {
