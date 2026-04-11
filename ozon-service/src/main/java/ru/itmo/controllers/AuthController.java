@@ -24,7 +24,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    @Operation(summary = "Логин", description = "Пароль в теле; эффективные роли и JWT зависят от IP (см. ClientIpResolver)")
+    @Operation(summary = "Логин", description = "Пароль в теле; эффективные роли и JWT зависят от IP (X-Forwarded-For, иначе remoteAddr; см. ClientIpResolver)")
     public LoginResponse login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         return authService.login(request, httpRequest);
     }

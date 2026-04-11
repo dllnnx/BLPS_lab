@@ -56,7 +56,6 @@ services:
       - PAYMENT_SERVICE_USERNAME=ozon-integration
       - PAYMENT_SERVICE_PASSWORD=ozon-secret
       - JWT_SECRET=${JWT_SECRET:-0123456789abcdef0123456789abcdef0123456789abcdef}
-      - CLIENT_IP_HEADER_ENABLE=${CLIENT_IP_HEADER_ENABLE:-true}
       - ACTIVEMQ_BROKER_URL=tcp://activemq:61616?wireFormat.maxInactivityDuration=60000
       - ACTIVEMQ_USERNAME=admin
       - ACTIVEMQ_PASSWORD=admin
