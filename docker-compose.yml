@@ -46,6 +46,8 @@ services:
     depends_on:
       db-ozon:
         condition: service_healthy
+      activemq:
+        condition: service_started
     environment:
       - DATABASE_HOST=db-ozon
       - DATABASE_PORT=5432
@@ -55,6 +57,9 @@ services:
       - PAYMENT_SERVICE_PASSWORD=ozon-secret
       - JWT_SECRET=${JWT_SECRET:-0123456789abcdef0123456789abcdef0123456789abcdef}
       - CLIENT_IP_HEADER_ENABLE=${CLIENT_IP_HEADER_ENABLE:-true}
+      - ACTIVEMQ_BROKER_URL=tcp://activemq:61616?wireFormat.maxInactivityDuration=60000
+      - ACTIVEMQ_USERNAME=admin
+      - ACTIVEMQ_PASSWORD=admin
       - YANDEX_MAPS_API_KEY=${YANDEX_MAPS_API_KEY}
     ports:
       - 8080:8080
@@ -69,11 +74,13 @@ services:
     depends_on:
       db-payment-service:
         condition: service_healthy
+      activemq:
+        condition: service_started
     environment:
       - DATABASE_HOST=db-payment-service
       - DATABASE_PORT=5432
       - SERVER_PORT=8081
-      - ACTIVEMQ_BROKER_URL=tcp://activemq:61616
+      - ACTIVEMQ_BROKER_URL=tcp://activemq:61616?wireFormat.maxInactivityDuration=60000
       - ACTIVEMQ_USERNAME=admin
       - ACTIVEMQ_PASSWORD=admin
     ports:

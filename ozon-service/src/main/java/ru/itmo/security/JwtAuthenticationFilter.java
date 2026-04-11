@@ -1,5 +1,6 @@
 package ru.itmo.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,7 +16,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final ClientIpResolver clientIpResolver;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
@@ -68,12 +72,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             var authentication = new UsernamePasswordAuthenticationToken(principal, null, auths);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (JwtService.JwtIpMismatchException e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            SecurityContextHolder.clearContext();
+            writeAuthError(response, HttpServletResponse.SC_UNAUTHORIZED, "TOKEN_IP_REVOKED", e.getMessage());
+            return;
+        } catch (JwtService.JwtRevokedException e) {
+            SecurityContextHolder.clearContext();
+            writeAuthError(response, HttpServletResponse.SC_UNAUTHORIZED, "TOKEN_REVOKED", e.getMessage());
             return;
         } catch (JwtException e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
+            SecurityContextHolder.clearContext();
+            writeAuthError(response, HttpServletResponse.SC_UNAUTHORIZED, "INVALID_TOKEN", "Invalid or expired token");
             return;
         }
         filterChain.doFilter(request, response);
+    }
+
+    private void writeAuthError(HttpServletResponse response, int status, String code, String message)
+            throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json;charset=UTF-8");
+        Map<String, String> body = new LinkedHashMap<>();
+        body.put("error", code);
+        body.put("message", message);
+        response.getWriter().write(objectMapper.writeValueAsString(body));
     }
 }
