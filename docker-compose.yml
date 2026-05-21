@@ -60,6 +60,7 @@ services:
       - ACTIVEMQ_USERNAME=admin
       - ACTIVEMQ_PASSWORD=admin
       - YANDEX_MAPS_API_KEY=${YANDEX_MAPS_API_KEY}
+      - CAMUNDA_CLIENT_BASE_URL=http://camunda:8080/engine-rest
     ports:
       - 8080:8080
       - 9990:9990
@@ -87,6 +88,17 @@ services:
       - 9091:9090
     networks:
       - backend
+
+  camunda:
+    image: camunda/camunda-bpm-platform:run-7.21.0
+    container_name: camunda
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./diagram_lab3.bpmn:/camunda/configuration/resources/diagram_lab3.bpmn
+    networks:
+      - backend
+    restart: unless-stopped
 
   activemq:
     image: rmohr/activemq

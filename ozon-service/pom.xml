@@ -148,6 +148,11 @@
             <artifactId>activemq-client</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.camunda.bpm</groupId>
+            <artifactId>camunda-external-task-client</artifactId>
+            <version>7.21.0</version>
+        </dependency>
+        <dependency>
             <groupId>ru.itmo</groupId>
             <artifactId>schema-registry</artifactId>
             <version>${project.version}</version>
