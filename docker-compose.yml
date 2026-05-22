@@ -82,7 +82,7 @@ services:
     ports:
       - "8082:8080"
     volumes:
-      - ./diagram_lab3.bpmn:/camunda/configuration/resources/diagram_lab3.bpmn
+      - ./diagram_lab3.bpmn:/camunda/configuration/resources/diagram_lab4.bpmn
     networks:
       - backend
     restart: unless-stopped
