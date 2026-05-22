@@ -12,6 +12,8 @@ import ru.itmo.dto.requests.DeliveryPriceRequest;
 import ru.itmo.dto.responses.DeliveryPriceResponse;
 import ru.itmo.services.DeliveryService;
 
+import java.math.RoundingMode;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -32,12 +34,12 @@ public class CalculateDeliveryWorker {
             log.info("Handling calculate-delivery task {}", externalTask.getId());
             log.info("Task variables: {}", externalTask.getAllVariables());
 
-            String rawAddress = externalTask.getVariable("address-raw");
+            String rawAddress = externalTask.getVariable("address_raw");
             DeliveryPriceResponse deliveryResponse = deliveryService.calculateDeliveryPrice(new DeliveryPriceRequest(rawAddress));
 
             externalTaskService.complete(externalTask,
                     Variables.createVariables()
-                            .putValue("delivery_cost", deliveryResponse.getPrice().toString())
+                            .putValue("delivery_cost", deliveryResponse.getPrice().setScale(2, RoundingMode.HALF_UP).toString())
                             .putValue("delivery_pickup_point_id", deliveryResponse.getNearestPickupPoint().getId()));
         } catch (Exception e) {
             log.error(e.getMessage());

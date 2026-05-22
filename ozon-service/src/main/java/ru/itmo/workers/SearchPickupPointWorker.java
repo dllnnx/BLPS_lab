@@ -32,7 +32,7 @@ public class SearchPickupPointWorker {
             log.info("Handling search-pickup-point task {}", externalTask.getId());
             log.info("Task variables: {}", externalTask.getAllVariables());
 
-            String rawAddress = externalTask.getVariable("address-raw");
+            String rawAddress = externalTask.getVariable("address_raw");
             DeliveryPriceResponse deliveryResponse = deliveryService.calculateDeliveryPrice(new DeliveryPriceRequest(rawAddress));
 
 

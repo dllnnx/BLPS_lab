@@ -29,7 +29,7 @@
       <bpmn:incoming>Flow_1020m6l</bpmn:incoming>
       <bpmn:outgoing>Flow_1vjx0j3</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:userTask id="Activity_16q4kzn" name="Нажатие кнопки &#34;Перейти к оплате&#34;" camunda:assignee="demo">
+    <bpmn:userTask id="Activity_16q4kzn" name="Перейти к оплате?" camunda:assignee="demo">
       <bpmn:incoming>Flow_0cc0v8w</bpmn:incoming>
       <bpmn:incoming>Flow_1fwda5y</bpmn:incoming>
     </bpmn:userTask>
@@ -69,7 +69,6 @@
         </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0rhhjyf</bpmn:incoming>
-      <bpmn:incoming>Flow_0vgyf4q</bpmn:incoming>
       <bpmn:outgoing>Flow_0ng1ath</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:userTask id="Activity_0djezhy" name="Вы хотите заказать доставку в ПВЗ?" camunda:assignee="demo">
@@ -115,9 +114,7 @@
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1sm6ikt</bpmn:incoming>
       <bpmn:incoming>Flow_0hz0owr</bpmn:incoming>
-      <bpmn:outgoing>Flow_0vgyf4q</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:sequenceFlow id="Flow_0vgyf4q" sourceRef="Activity_10773q9" targetRef="Activity_1xil5ld" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_14e79fj">
@@ -239,12 +236,6 @@
       <bpmndi:BPMNEdge id="Flow_0hz0owr_di" bpmnElement="Flow_0hz0owr">
         <di:waypoint x="980" y="537" />
         <di:waypoint x="980" y="200" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0vgyf4q_di" bpmnElement="Flow_0vgyf4q">
-        <di:waypoint x="930" y="160" />
-        <di:waypoint x="270" y="160" />
-        <di:waypoint x="270" y="285" />
-        <di:waypoint x="320" y="285" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
