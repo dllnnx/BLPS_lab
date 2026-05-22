@@ -81,11 +81,11 @@ services:
     container_name: camunda
     ports:
       - "8082:8080"
-    volumes:
-      - ./diagram_lab3.bpmn:/camunda/configuration/resources/diagram_lab4.bpmn
     networks:
       - backend
     restart: unless-stopped
+    environment:
+      CAMUNDA_BPM_RUN_EXAMPLE_ENABLED: "false"
 
   activemq:
     image: rmohr/activemq
