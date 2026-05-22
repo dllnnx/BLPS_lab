@@ -70,6 +70,7 @@ services:
       - DATABASE_HOST=db-payment-service
       - DATABASE_PORT=5432
       - SERVER_PORT=8081
+      - CAMUNDA_CLIENT_BASE_URL=http://camunda:8080/engine-rest
     ports:
       - 8081:8081
       - 9091:9090

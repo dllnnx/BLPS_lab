@@ -1,11 +1,13 @@
 package ru.itmo.dto.requests;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.UUID;
 
 @Data
+@AllArgsConstructor
 public class PayRequest {
 
     @NotBlank

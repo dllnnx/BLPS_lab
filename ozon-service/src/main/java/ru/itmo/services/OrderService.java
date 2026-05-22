@@ -34,6 +34,39 @@ public class OrderService {
     private final PaymentServiceClient paymentServiceClient;
     private final ModelMapper modelMapper;
 
+    public Order createOnlyOrder(CreateOrderRequest request) {
+        PickupPoint pickupPoint = pickupPointRepository.findById(request.getPickupPointId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pickup point not found"));
+        return orderRepository.save(new Order(
+                null,
+                null,
+                OrderStatus.NEW,
+                "camunda", // todo
+                pickupPoint,
+                request.getDeliveryAddress()
+        ));
+    }
+
+    public void savePaymentLink(UUID paymentId, Long orderId){
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order not found"));
+        order.setPaymentId(paymentId);
+        orderRepository.save(order);
+    }
+
+    public void removeOrder(Long orderId){
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order not found"));
+        orderRepository.delete(order);
+    }
+
+    public void saveSuccessStatusForOrder(Long orderId){
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order not found"));
+        order.setOrderStatus(OrderStatus.PAID);
+        orderRepository.save(order);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public CreateOrderResponse createOrder(AppUserPrincipal user, CreateOrderRequest request) {
 

@@ -8,22 +8,26 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.stereotype.Component;
+import ru.itmo.dto.requests.CreateOrderRequest;
 import ru.itmo.dto.requests.DeliveryPriceRequest;
 import ru.itmo.dto.responses.DeliveryPriceResponse;
+import ru.itmo.models.Order;
 import ru.itmo.services.DeliveryService;
+import ru.itmo.services.OrderService;
 
 import java.math.RoundingMode;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class SearchPickupPointWorker {
+public class CreateOrderWorker {
     private final ExternalTaskClient client;
-    private final DeliveryService deliveryService;
+    private final OrderService orderService;
+    private String topic = "create-order";
 
     @PostConstruct
     public void subscribe() {
-        client.subscribe("search-pickup-point")
+        client.subscribe(topic)
                 .lockDuration(1000)
                 .handler(this::execute)
                 .open();
@@ -31,26 +35,23 @@ public class SearchPickupPointWorker {
 
     private void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
         try {
-            log.info("Handling search-pickup-point task {}", externalTask.getId());
+            log.info("Handling {} task {}", topic, externalTask.getId());
             log.info("Task variables: {}", externalTask.getAllVariables());
 
             String rawAddress = externalTask.getVariable("address_raw");
-            DeliveryPriceResponse deliveryResponse = deliveryService.calculateDeliveryPrice(new DeliveryPriceRequest(rawAddress));
+            Long pickupPointId = externalTask.getVariable("delivery_pickup_point_id");
+            Long deliveryCost = externalTask.getVariable("delivery_cost");
 
+            Order order = orderService.createOnlyOrder(new CreateOrderRequest(pickupPointId, rawAddress, deliveryCost));
 
             externalTaskService.complete(externalTask,
                     Variables.createVariables()
-                            .putValue("delivery_pickup_point_id", deliveryResponse.getNearestPickupPoint().getId())
-                            .putValue("delivery_pickup_point_address", deliveryResponse.getNearestPickupPoint().getAddress())
-                            .putValue("delivery_pickup_point_lng", deliveryResponse.getNearestPickupPoint().getLng())
-                            .putValue("delivery_pickup_point_lat", deliveryResponse.getNearestPickupPoint().getLat())
-                            .putValue("delivery_cost", 0L)
-            );
+                            .putValue("order_id", order.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
             externalTaskService.handleBpmnError(
                     externalTask,
-                    "Возникла ошибка при расчете стоимости доставки");
+                    "Возникла ошибка при создании заказа");
         }
     }
 }
