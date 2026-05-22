@@ -163,16 +163,16 @@
       <bpmn:outgoing>Flow_0c7g7yb</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0c7g7yb" sourceRef="Activity_18hr1ae" targetRef="Activity_05vv7z3" />
-    <bpmn:userTask id="Activity_05vv7z3" name="Ошибка">
+    <bpmn:userTask id="Activity_05vv7z3" name="Ошибка" camunda:assignee="demo">
       <bpmn:extensionElements>
         <camunda:formData>
-          <camunda:formField id="error" label="Возникла непредвиденная системная ошибка" />
+          <camunda:formField id="error" label="Возникла непредвиденная системная ошибка" type="string" />
         </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0c7g7yb</bpmn:incoming>
     </bpmn:userTask>
     <bpmn:sequenceFlow id="Flow_0fdo5ge" sourceRef="Activity_0hm9xdy" targetRef="Activity_0ev62yt" />
-    <bpmn:userTask id="Activity_0ev62yt" name="Оплата заказа">
+    <bpmn:userTask id="Activity_0ev62yt" name="Оплата заказа" camunda:assignee="demo">
       <bpmn:extensionElements>
         <camunda:formData>
           <camunda:formField id="card_id" label="Номер карточки" type="string" defaultValue="4000000000000002" />
@@ -182,6 +182,7 @@
         </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0fdo5ge</bpmn:incoming>
+      <bpmn:incoming>Flow_1k7u3rs</bpmn:incoming>
       <bpmn:outgoing>Flow_0jzodwi</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:boundaryEvent id="Event_1ffngh0" attachedToRef="Activity_0hm9xdy">
@@ -198,13 +199,14 @@
       <bpmn:errorEventDefinition id="ErrorEventDefinition_1ba2zsg" />
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="Flow_0f7hgnw" sourceRef="Event_10lcyl3" targetRef="Activity_1oky5hl" />
-    <bpmn:userTask id="Activity_1oky5hl" name="Ошибка оплаты">
+    <bpmn:userTask id="Activity_1oky5hl" name="Ошибка оплаты" camunda:assignee="demo">
       <bpmn:extensionElements>
         <camunda:formData>
-          <camunda:formField id="error" label="Ошибка" />
+          <camunda:formField id="error" label="Ошибка" type="string" />
         </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0f7hgnw</bpmn:incoming>
+      <bpmn:outgoing>Flow_1k7u3rs</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:intermediateThrowEvent id="Event_1bgyr3z" name="Отправить успешную оплату">
       <bpmn:incoming>Flow_11jc707</bpmn:incoming>
@@ -221,9 +223,10 @@
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0t9v9qb" sourceRef="Event_0cllxeq" targetRef="Activity_1aajbvb" />
     <bpmn:sequenceFlow id="Flow_0ry2kga" sourceRef="Activity_1aajbvb" targetRef="Activity_099aqwr" />
-    <bpmn:userTask id="Activity_099aqwr" name="Заказ создан!">
+    <bpmn:userTask id="Activity_099aqwr" name="Заказ создан!" camunda:assignee="demo">
       <bpmn:incoming>Flow_0ry2kga</bpmn:incoming>
     </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1k7u3rs" sourceRef="Activity_1oky5hl" targetRef="Activity_0ev62yt" />
   </bpmn:process>
   <bpmn:message id="success-payment" name="success-payment" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -477,6 +480,12 @@
         <di:waypoint x="2820" y="530" />
         <di:waypoint x="2820" y="260" />
         <di:waypoint x="2850" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1k7u3rs_di" bpmnElement="Flow_1k7u3rs">
+        <di:waypoint x="2420" y="210" />
+        <di:waypoint x="2180" y="210" />
+        <di:waypoint x="2180" y="270" />
+        <di:waypoint x="2210" y="270" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
