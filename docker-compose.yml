@@ -76,6 +76,26 @@ services:
     networks:
       - backend
 
+  camunda:
+    image: camunda/camunda-bpm-platform:run-7.21.0
+    container_name: camunda
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./diagram_lab3.bpmn:/camunda/configuration/resources/diagram_lab3.bpmn
+    networks:
+      - backend
+    restart: unless-stopped
+
+  activemq:
+    image: rmohr/activemq
+    container_name: activemq
+    ports:
+      - "61616:61616"
+      - "8161:8161"
+    networks:
+      - backend
+
 networks:
   backend:
 
