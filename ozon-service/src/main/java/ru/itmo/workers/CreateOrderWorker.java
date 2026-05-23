@@ -15,6 +15,7 @@ import ru.itmo.models.Order;
 import ru.itmo.services.DeliveryService;
 import ru.itmo.services.OrderService;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Component
@@ -23,7 +24,7 @@ import java.math.RoundingMode;
 public class CreateOrderWorker {
     private final ExternalTaskClient client;
     private final OrderService orderService;
-    private String topic = "create-order";
+    private final String topic = "create_order";
 
     @PostConstruct
     public void subscribe() {
@@ -40,7 +41,10 @@ public class CreateOrderWorker {
 
             String rawAddress = externalTask.getVariable("address_raw");
             Long pickupPointId = externalTask.getVariable("delivery_pickup_point_id");
-            Long deliveryCost = externalTask.getVariable("delivery_cost");
+            String deliveryCostString = externalTask.getVariable("delivery_cost");
+            Long deliveryCost = new BigDecimal(deliveryCostString)
+                    .multiply(BigDecimal.valueOf(100))
+                    .longValue();
 
             Order order = orderService.createOnlyOrder(new CreateOrderRequest(pickupPointId, rawAddress, deliveryCost));
 

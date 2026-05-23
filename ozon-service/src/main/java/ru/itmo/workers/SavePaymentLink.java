@@ -20,7 +20,7 @@ import java.util.UUID;
 public class SavePaymentLink {
     private final ExternalTaskClient client;
     private final OrderService orderService;
-    private String topic = "save-payment-link";
+    private String topic = "save_payment_link";
 
     @PostConstruct
     public void subscribe() {

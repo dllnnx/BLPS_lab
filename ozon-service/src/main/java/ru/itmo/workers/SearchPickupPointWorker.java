@@ -23,7 +23,7 @@ public class SearchPickupPointWorker {
 
     @PostConstruct
     public void subscribe() {
-        client.subscribe("search-pickup-point")
+        client.subscribe("search_pickup_point")
                 .lockDuration(1000)
                 .handler(this::execute)
                 .open();
@@ -44,7 +44,7 @@ public class SearchPickupPointWorker {
                             .putValue("delivery_pickup_point_address", deliveryResponse.getNearestPickupPoint().getAddress())
                             .putValue("delivery_pickup_point_lng", deliveryResponse.getNearestPickupPoint().getLng())
                             .putValue("delivery_pickup_point_lat", deliveryResponse.getNearestPickupPoint().getLat())
-                            .putValue("delivery_cost", 0L)
+                            .putValue("delivery_cost", "0")
             );
         } catch (Exception e) {
             log.error(e.getMessage());

@@ -11,13 +11,15 @@ import org.springframework.stereotype.Component;
 import ru.itmo.dto.responses.CreatePaymentResponse;
 import ru.itmo.services.PaymentService;
 
+import java.math.BigDecimal;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class CreatePaymentLinkWorker {
     private final ExternalTaskClient client;
     private final PaymentService paymentService;
-    private String topic = "generate-payment-link";
+    private String topic = "generate_payment_link";
 
     @PostConstruct
     public void subscribe() {
@@ -32,7 +34,10 @@ public class CreatePaymentLinkWorker {
             log.info("Handling {} task {}", topic, externalTask.getId());
             log.info("Task variables: {}", externalTask.getAllVariables());
 
-            Long deliveryCost = externalTask.getVariable("delivery_cost");
+            String deliveryCostString = externalTask.getVariable("delivery_cost");
+            Long deliveryCost = new BigDecimal(deliveryCostString)
+                    .multiply(BigDecimal.valueOf(100))
+                    .longValue();
 
             CreatePaymentResponse response = paymentService.createPayment(deliveryCost);
 

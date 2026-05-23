@@ -23,7 +23,7 @@ public class CalculateDeliveryWorker {
 
     @PostConstruct
     public void subscribe() {
-        client.subscribe("calculate-delivery")
+        client.subscribe("calculate_delivery")
                 .lockDuration(1000)
                 .handler(this::execute)
                 .open();

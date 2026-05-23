@@ -17,7 +17,7 @@ import java.util.UUID;
 public class RemoveOrderWorker {
     private final ExternalTaskClient client;
     private final OrderService orderService;
-    private String topic = "remove-order";
+    private String topic = "remove_order";
 
     @PostConstruct
     public void subscribe() {

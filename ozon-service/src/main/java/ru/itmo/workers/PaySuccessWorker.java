@@ -15,7 +15,7 @@ import ru.itmo.services.OrderService;
 public class PaySuccessWorker {
     private final ExternalTaskClient client;
     private final OrderService orderService;
-    private String topic = "pay-success";
+    private String topic = "pay_success";
 
     @PostConstruct
     public void subscribe() {
