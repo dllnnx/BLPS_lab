@@ -3,6 +3,7 @@ package ru.itmo.services;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,14 +35,15 @@ public class OrderService {
     private final PaymentServiceClient paymentServiceClient;
     private final ModelMapper modelMapper;
 
-    public Order createOnlyOrder(CreateOrderRequest request) {
+    @PreAuthorize("hasAuthority('ORDER_CREATE')")
+    public Order createOnlyOrder(String username, CreateOrderRequest request) {
         PickupPoint pickupPoint = pickupPointRepository.findById(request.getPickupPointId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pickup point not found"));
         return orderRepository.save(new Order(
                 null,
                 null,
                 OrderStatus.NEW,
-                "camunda", // todo
+                username,
                 pickupPoint,
                 request.getDeliveryAddress()
         ));

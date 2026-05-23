@@ -9,10 +9,8 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.stereotype.Component;
 import ru.itmo.dto.requests.CreateOrderRequest;
-import ru.itmo.dto.requests.DeliveryPriceRequest;
-import ru.itmo.dto.responses.DeliveryPriceResponse;
 import ru.itmo.models.Order;
-import ru.itmo.services.DeliveryService;
+import ru.itmo.security.WorkerSecurityHelper;
 import ru.itmo.services.OrderService;
 
 import java.math.BigDecimal;
@@ -24,6 +22,7 @@ import java.math.RoundingMode;
 public class CreateOrderWorker {
     private final ExternalTaskClient client;
     private final OrderService orderService;
+    private final WorkerSecurityHelper workerSecurityHelper;
     private final String topic = "create_order";
 
     @PostConstruct
@@ -35,9 +34,11 @@ public class CreateOrderWorker {
     }
 
     private void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+        String username = externalTask.getVariable("initiator");
         try {
-            log.info("Handling {} task {}", topic, externalTask.getId());
-            log.info("Task variables: {}", externalTask.getAllVariables());
+            log.info("Handling {} task {} for user '{}'", topic, externalTask.getId(), username);
+
+            workerSecurityHelper.authenticateAs(username);
 
             String rawAddress = externalTask.getVariable("address_raw");
             Long pickupPointId = externalTask.getVariable("delivery_pickup_point_id");
@@ -46,7 +47,7 @@ public class CreateOrderWorker {
                     .multiply(BigDecimal.valueOf(100))
                     .longValue();
 
-            Order order = orderService.createOnlyOrder(new CreateOrderRequest(pickupPointId, rawAddress, deliveryCost));
+            Order order = orderService.createOnlyOrder(username, new CreateOrderRequest(pickupPointId, rawAddress, deliveryCost));
 
             externalTaskService.complete(externalTask,
                     Variables.createVariables()
@@ -56,6 +57,8 @@ public class CreateOrderWorker {
             externalTaskService.handleBpmnError(
                     externalTask,
                     "Возникла ошибка при создании заказа");
+        } finally {
+            workerSecurityHelper.clear();
         }
     }
 }
