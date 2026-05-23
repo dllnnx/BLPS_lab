@@ -50,14 +50,15 @@ public class CamundaUserSyncService {
 
     private void syncUser(AppUser user) {
         String username = user.getUsername();
-        if (userExistsInCamunda(username)) {
-            log.debug("Camunda user '{}' already exists, skipping", username);
-            return;
+        if (!userExistsInCamunda(username)) {
+            createCamundaUser(username);
+            grantAppAccess(username, "cockpit");
+            grantAppAccess(username, "tasklist");
+            log.info("Created Camunda user '{}' with roles {}", username, user.getRoles());
+        } else {
+            log.debug("Camunda user '{}' already exists", username);
         }
-        createCamundaUser(username);
-        grantAppAccess(username, "cockpit");
-        grantAppAccess(username, "tasklist");
-        log.info("Created Camunda user '{}' with roles {}", username, user.getRoles());
+        addToAdminGroup(username);
     }
 
     private boolean userExistsInCamunda(String username) {
@@ -81,6 +82,15 @@ public class CamundaUserSyncService {
                 "credentials", Map.of("password", syncPassword)
         );
         camundaRestTemplate.postForEntity(camundaBaseUrl + "/user/create", body, Void.class);
+    }
+
+    private void addToAdminGroup(String username) {
+        try {
+            camundaRestTemplate.put(
+                    camundaBaseUrl + "/group/camunda-admin/members/" + username, null);
+        } catch (Exception e) {
+            log.warn("Could not add '{}' to camunda-admin group: {}", username, e.getMessage());
+        }
     }
 
     private void grantAppAccess(String username, String app) {
