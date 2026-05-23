@@ -1,7 +1,7 @@
 package ru.itmo.services;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -17,12 +17,19 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class CamundaUserSyncService {
 
     private final AppUserRepository appUserRepository;
     private final RestTemplate camundaRestTemplate;
+
+    public CamundaUserSyncService(
+            AppUserRepository appUserRepository,
+            @Qualifier("camundaRestTemplate") RestTemplate camundaRestTemplate
+    ) {
+        this.appUserRepository = appUserRepository;
+        this.camundaRestTemplate = camundaRestTemplate;
+    }
 
     @Value("${camunda.client.base-url}")
     private String camundaBaseUrl;
