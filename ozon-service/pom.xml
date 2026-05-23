@@ -17,7 +17,7 @@
 
     <artifactId>ozon-service</artifactId>
     <name>BLPS :: OZON service</name>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <dependencyManagement>
         <dependencies>

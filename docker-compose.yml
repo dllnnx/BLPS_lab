@@ -53,6 +53,7 @@ services:
       - PAYMENT_SERVICE_URL=http://payment-service:8081
       - PAYMENT_SERVICE_USERNAME=ozon-integration
       - PAYMENT_SERVICE_PASSWORD=ozon-secret
+      - CAMUNDA_CLIENT_BASE_URL=http://camunda:8080/engine-rest
     ports:
       - 8080:8080
       - 9090:9090
@@ -88,14 +89,14 @@ services:
     environment:
       CAMUNDA_BPM_RUN_EXAMPLE_ENABLED: "false"
 
-  activemq:
-    image: rmohr/activemq
-    container_name: activemq
-    ports:
-      - "61616:61616"
-      - "8161:8161"
-    networks:
-      - backend
+#  activemq:
+#    image: rmohr/activemq
+#    container_name: activemq
+#    ports:
+#      - "61616:61616"
+#      - "8161:8161"
+#    networks:
+#      - backend
 
 networks:
   backend:
