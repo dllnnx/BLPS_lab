@@ -22,25 +22,25 @@ public class PaymentRetriever {
     private final OrderRepository orderRepository;
     private final PaymentServiceClient paymentServiceClient;
 
-    @Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
-    public void retrievePayments() {
-        List<Order> unfinishedOrders = orderRepository.getAllByOrderStatus(OrderStatus.NEW);
-        log.info("Retrieved {} orders", unfinishedOrders.size());
-        for (Order order : unfinishedOrders) {
-            PaymentStatusResponse paymentStatusResponse = paymentServiceClient.getPaymentStatus(order.getPaymentId());
-            if (paymentStatusResponse.getStatus() == PaymentStatus.FAILED) {
-                order.setOrderStatus(OrderStatus.PAYMENT_ERROR);
-                orderRepository.save(order);
-                log.info("Payment failed: {}", order.getPaymentId());
-            } else if (paymentStatusResponse.getStatus() == PaymentStatus.COMPLETED) {
-                order.setOrderStatus(OrderStatus.PAID);
-                orderRepository.save(order);
-                log.info("Payment completed: {}", order.getPaymentId());
-            } else if (paymentStatusResponse.getStatus() == PaymentStatus.INVALID) {
-                log.debug("Payment invalidated (order may be cancelled): {}", order.getPaymentId());
-            } else {
-                log.info("Payment is pending: {}", order.getPaymentId());
-            }
-        }
-    }
+//    @Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
+//    public void retrievePayments() {
+//        List<Order> unfinishedOrders = orderRepository.getAllByOrderStatus(OrderStatus.NEW);
+//        log.info("Retrieved {} orders", unfinishedOrders.size());
+//        for (Order order : unfinishedOrders) {
+//            PaymentStatusResponse paymentStatusResponse = paymentServiceClient.getPaymentStatus(order.getPaymentId());
+//            if (paymentStatusResponse.getStatus() == PaymentStatus.FAILED) {
+//                order.setOrderStatus(OrderStatus.PAYMENT_ERROR);
+//                orderRepository.save(order);
+//                log.info("Payment failed: {}", order.getPaymentId());
+//            } else if (paymentStatusResponse.getStatus() == PaymentStatus.COMPLETED) {
+//                order.setOrderStatus(OrderStatus.PAID);
+//                orderRepository.save(order);
+//                log.info("Payment completed: {}", order.getPaymentId());
+//            } else if (paymentStatusResponse.getStatus() == PaymentStatus.INVALID) {
+//                log.debug("Payment invalidated (order may be cancelled): {}", order.getPaymentId());
+//            } else {
+//                log.info("Payment is pending: {}", order.getPaymentId());
+//            }
+//        }
+//    }
 }
