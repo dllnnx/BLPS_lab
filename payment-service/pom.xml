@@ -12,6 +12,7 @@
 
     <artifactId>payment-service</artifactId>
     <name>BLPS :: Payment service</name>
+    <packaging>war</packaging>
 
     <dependencyManagement>
         <dependencies>
@@ -26,6 +27,17 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>

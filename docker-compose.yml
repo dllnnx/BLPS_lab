@@ -88,14 +88,14 @@ services:
     environment:
       CAMUNDA_BPM_RUN_EXAMPLE_ENABLED: "false"
 
-  activemq:
-    image: rmohr/activemq
-    container_name: activemq
-    ports:
-      - "61616:61616"
-      - "8161:8161"
-    networks:
-      - backend
+#  activemq:
+#    image: rmohr/activemq
+#    container_name: activemq
+#    ports:
+#      - "61616:61616"
+#      - "8161:8161"
+#    networks:
+#      - backend
 
 networks:
   backend:
