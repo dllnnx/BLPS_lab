@@ -14,7 +14,6 @@ import ru.itmo.security.WorkerSecurityHelper;
 import ru.itmo.services.OrderService;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 @Component
 @RequiredArgsConstructor
@@ -28,7 +27,7 @@ public class CreateOrderWorker {
     @PostConstruct
     public void subscribe() {
         client.subscribe(topic)
-                .lockDuration(1000)
+                .lockDuration(60_000)
                 .handler(this::execute)
                 .open();
     }

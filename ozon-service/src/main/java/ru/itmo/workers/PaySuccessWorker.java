@@ -20,7 +20,7 @@ public class PaySuccessWorker {
     @PostConstruct
     public void subscribe() {
         client.subscribe(topic)
-                .lockDuration(1000)
+                .lockDuration(60_000)
                 .handler(this::execute)
                 .open();
     }

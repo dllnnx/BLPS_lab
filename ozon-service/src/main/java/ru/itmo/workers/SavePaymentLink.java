@@ -6,10 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
-import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.stereotype.Component;
-import ru.itmo.dto.requests.CreateOrderRequest;
-import ru.itmo.models.Order;
 import ru.itmo.services.OrderService;
 
 import java.util.UUID;
@@ -25,7 +22,7 @@ public class SavePaymentLink {
     @PostConstruct
     public void subscribe() {
         client.subscribe(topic)
-                .lockDuration(1000)
+                .lockDuration(60_000)
                 .handler(this::execute)
                 .open();
     }

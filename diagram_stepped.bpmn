@@ -3,7 +3,7 @@
   <bpmn:collaboration id="Collaboration_14e79fj">
     <bpmn:participant id="Participant_0lcd4j7" name="Ozon" processRef="Process_1qfixpd" />
   </bpmn:collaboration>
-  <bpmn:process id="Process_1qfixpd" name="Ozon-delivery" isExecutable="true" camunda:historyTimeToLive="180">
+  <bpmn:process id="Process_1qfixpd" name="Ozon-delivery" isExecutable="true" camunda:historyTimeToLive="180" camunda:isStartableInTasklist="true">
     <bpmn:laneSet id="LaneSet_1xmecgh">
       <bpmn:lane id="Lane_029spmx" name="Frontend">
         <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
@@ -11,48 +11,60 @@
         <bpmn:flowNodeRef>Activity_1im0kqb</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_0c17qoc</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_1xil5ld</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_AddressInvalid</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_0djezhy</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_08xzbxs</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_10773q9</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_05vv7z3</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_0ev62yt</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_1oky5hl</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_099aqwr</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="Lane_04tslkx" name="ozon-service">
         <bpmn:flowNodeRef>Activity_0w2irur</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_0olcm0e</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_18hr1ae</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_0hm9xdy</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1y1svlg</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_0qntxt6</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_0cllxeq</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_1aajbvb</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_1ffngh0</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="Lane_179eyg7" name="payment service">
         <bpmn:flowNodeRef>Activity_1ye6odb</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_10lcyl3</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1bgyr3z</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
-    <bpmn:startEvent id="StartEvent_1">
+    <bpmn:startEvent id="StartEvent_1" camunda:initiator="initiator">
       <bpmn:outgoing>Flow_0rhhjyf</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:serviceTask id="Activity_0w2irur" name="Расчет стоимости доставки курьером" camunda:type="external" camunda:topic="calculate_delivery">
       <bpmn:incoming>Flow_1020m6l</bpmn:incoming>
       <bpmn:outgoing>Flow_1vjx0j3</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:userTask id="Activity_16q4kzn" name="Перейти к оплате?" camunda:assignee="demo">
-      <bpmn:incoming>Flow_0cc0v8w</bpmn:incoming>
-      <bpmn:incoming>Flow_1fwda5y</bpmn:incoming>
-      <bpmn:outgoing>Flow_0u6j49i</bpmn:outgoing>
-    </bpmn:userTask>
-    <bpmn:userTask id="Activity_1im0kqb" name="Рассчитанная стоимость доставки" camunda:assignee="demo">
+    <bpmn:userTask id="Activity_16q4kzn" name="Перейти к оплате?" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
         <camunda:formData>
-          <camunda:formField id="delivery_cost" label="Рассчитанная стоимость доставки:" type="string" />
+          <camunda:formField id="order_error" label="Ошибка предыдущего подтверждения" type="string" defaultValue="">
+            <camunda:properties>
+              <camunda:property id="readonly" value="true" />
+            </camunda:properties>
+          </camunda:formField>
         </camunda:formData>
+        <camunda:taskListener event="complete" class="ru.itmo.bpmn.listener.OrderConfirmationValidationListener" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0cc0v8w</bpmn:incoming>
+      <bpmn:incoming>Flow_1fwda5y</bpmn:incoming>
+      <bpmn:incoming>Flow_OrderRetry</bpmn:incoming>
+      <bpmn:outgoing>Flow_0u6j49i</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="Event_OrderInvalid" attachedToRef="Activity_16q4kzn">
+      <bpmn:outgoing>Flow_OrderRetry</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_OrderInvalid" errorRef="Error_OrderInvalid" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_OrderRetry" sourceRef="Event_OrderInvalid" targetRef="Activity_16q4kzn" />
+    <bpmn:userTask id="Activity_1im0kqb" name="Рассчитанная стоимость доставки" camunda:assignee="${initiator}">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="delivery_cost_display" label="Рассчитанная стоимость доставки:" type="string" />
+        </camunda:formData>
+        <camunda:taskListener event="create" class="ru.itmo.bpmn.listener.DeliveryCostDisplayListener" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1vjx0j3</bpmn:incoming>
       <bpmn:outgoing>Flow_0cc0v8w</bpmn:outgoing>
@@ -73,20 +85,34 @@
     <bpmn:sequenceFlow id="Flow_1vjx0j3" sourceRef="Activity_0w2irur" targetRef="Activity_1im0kqb" />
     <bpmn:sequenceFlow id="Flow_0cc0v8w" sourceRef="Activity_1im0kqb" targetRef="Activity_16q4kzn" />
     <bpmn:sequenceFlow id="Flow_1je5z7r" sourceRef="Activity_0djezhy" targetRef="Gateway_0c17qoc" />
-    <bpmn:userTask id="Activity_1xil5ld" name="Ввод адреса для доставки" camunda:assignee="demo">
+    <bpmn:userTask id="Activity_1xil5ld" name="Ввод адреса для доставки" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
         <camunda:formData>
+          <camunda:formField id="address_error" label="Ошибка предыдущего ввода" type="string" defaultValue="">
+            <camunda:properties>
+              <camunda:property id="readonly" value="true" />
+            </camunda:properties>
+          </camunda:formField>
           <camunda:formField id="address_raw" label="Введите адрес для доставки" type="string" defaultValue="Гражданский проспект, 20">
             <camunda:validation>
               <camunda:constraint name="required" />
             </camunda:validation>
           </camunda:formField>
         </camunda:formData>
+        <camunda:taskListener event="complete" class="ru.itmo.bpmn.listener.AddressValidationListener" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0rhhjyf</bpmn:incoming>
+      <bpmn:incoming>Flow_1sm6ikt</bpmn:incoming>
+      <bpmn:incoming>Flow_0hz0owr</bpmn:incoming>
+      <bpmn:incoming>Flow_AddressRetry</bpmn:incoming>
       <bpmn:outgoing>Flow_0ng1ath</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:userTask id="Activity_0djezhy" name="Вы хотите заказать доставку в ПВЗ?" camunda:assignee="demo">
+    <bpmn:boundaryEvent id="Event_AddressInvalid" attachedToRef="Activity_1xil5ld">
+      <bpmn:outgoing>Flow_AddressRetry</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_AddressInvalid" errorRef="Error_AddressInvalid" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_AddressRetry" sourceRef="Event_AddressInvalid" targetRef="Activity_1xil5ld" />
+    <bpmn:userTask id="Activity_0djezhy" name="Вы хотите заказать доставку в ПВЗ?" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
         <camunda:formData>
           <camunda:formField id="delivery_to_pickup_point" label="Доставка до пвз?" type="boolean" defaultValue="true">
@@ -99,11 +125,12 @@
       <bpmn:outgoing>Flow_1je5z7r</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:sequenceFlow id="Flow_1smak8f" sourceRef="Activity_0olcm0e" targetRef="Activity_08xzbxs" />
-    <bpmn:userTask id="Activity_08xzbxs" name="Ваш ближайший ПВЗ" camunda:assignee="demo">
+    <bpmn:userTask id="Activity_08xzbxs" name="Ваш ближайший ПВЗ" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
         <camunda:formData>
-          <camunda:formField id="delivery_pickup_point_address" label="Адрес" type="string" />
+          <camunda:formField id="delivery_pickup_point_display" label="Адрес" type="string" />
         </camunda:formData>
+        <camunda:taskListener event="create" class="ru.itmo.bpmn.listener.PickupPointDisplayListener" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1smak8f</bpmn:incoming>
       <bpmn:outgoing>Flow_1fwda5y</bpmn:outgoing>
@@ -121,15 +148,8 @@
       <bpmn:outgoing>Flow_0hz0owr</bpmn:outgoing>
       <bpmn:errorEventDefinition id="ErrorEventDefinition_0k1gnyu" />
     </bpmn:boundaryEvent>
-    <bpmn:sequenceFlow id="Flow_1sm6ikt" sourceRef="Event_1y1svlg" targetRef="Activity_10773q9" />
-    <bpmn:sequenceFlow id="Flow_0hz0owr" sourceRef="Event_0qntxt6" targetRef="Activity_10773q9" />
-    <bpmn:userTask id="Activity_10773q9" name="Введеный адрес не валиден!" camunda:assignee="demo">
-      <bpmn:extensionElements>
-        <camunda:formData />
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1sm6ikt</bpmn:incoming>
-      <bpmn:incoming>Flow_0hz0owr</bpmn:incoming>
-    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1sm6ikt" sourceRef="Event_1y1svlg" targetRef="Activity_1xil5ld" />
+    <bpmn:sequenceFlow id="Flow_0hz0owr" sourceRef="Event_0qntxt6" targetRef="Activity_1xil5ld" />
     <bpmn:sequenceFlow id="Flow_0u6j49i" sourceRef="Activity_16q4kzn" targetRef="Activity_0hm9xdy" />
     <bpmn:transaction id="Activity_0hm9xdy" name="Создание платежной ссылки">
       <bpmn:incoming>Flow_0u6j49i</bpmn:incoming>
@@ -157,53 +177,36 @@
       </bpmn:endEvent>
       <bpmn:sequenceFlow id="Flow_1fbgo9r" sourceRef="Activity_151bu8f" targetRef="Event_0ynvrbr" />
     </bpmn:transaction>
-    <bpmn:sequenceFlow id="Flow_14edwje" sourceRef="Event_1ffngh0" targetRef="Activity_18hr1ae" />
-    <bpmn:serviceTask id="Activity_18hr1ae" name="Удалить заказ" camunda:type="external" camunda:topic="remove_order">
-      <bpmn:incoming>Flow_14edwje</bpmn:incoming>
-      <bpmn:outgoing>Flow_0c7g7yb</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_0c7g7yb" sourceRef="Activity_18hr1ae" targetRef="Activity_05vv7z3" />
-    <bpmn:userTask id="Activity_05vv7z3" name="Ошибка" camunda:assignee="demo">
-      <bpmn:extensionElements>
-        <camunda:formData>
-          <camunda:formField id="error" label="Возникла непредвиденная системная ошибка" type="string" />
-        </camunda:formData>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0c7g7yb</bpmn:incoming>
-    </bpmn:userTask>
     <bpmn:sequenceFlow id="Flow_0fdo5ge" sourceRef="Activity_0hm9xdy" targetRef="Activity_0ev62yt" />
-    <bpmn:userTask id="Activity_0ev62yt" name="Оплата заказа" camunda:assignee="demo">
+    <bpmn:userTask id="Activity_0ev62yt" name="Оплата заказа" camunda:assignee="${initiator}">
       <bpmn:extensionElements>
         <camunda:formData>
+          <camunda:formField id="payment_error" label="Ошибка предыдущей оплаты" type="string" defaultValue="">
+            <camunda:properties>
+              <camunda:property id="readonly" value="true" />
+            </camunda:properties>
+          </camunda:formField>
           <camunda:formField id="card_id" label="Номер карточки" type="string" defaultValue="4000000000000002" />
           <camunda:formField id="card_month" label="Месяц окончания действия" type="long" defaultValue="12" />
           <camunda:formField id="card_year" label="Год окончания действия" type="long" defaultValue="29" />
           <camunda:formField id="cvc" label="CVC" type="string" defaultValue="111" />
         </camunda:formData>
+        <camunda:taskListener event="complete" class="ru.itmo.bpmn.listener.PaymentValidationListener" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0fdo5ge</bpmn:incoming>
-      <bpmn:incoming>Flow_1k7u3rs</bpmn:incoming>
+      <bpmn:incoming>Flow_PaymentRetry</bpmn:incoming>
       <bpmn:outgoing>Flow_0jzodwi</bpmn:outgoing>
     </bpmn:userTask>
+    <bpmn:boundaryEvent id="Event_PaymentInvalid" attachedToRef="Activity_0ev62yt">
+      <bpmn:outgoing>Flow_PaymentRetry</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_PaymentInvalid" errorRef="Error_PaymentInvalid" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_PaymentRetry" sourceRef="Event_PaymentInvalid" targetRef="Activity_0ev62yt" />
     <bpmn:sequenceFlow id="Flow_0jzodwi" sourceRef="Activity_0ev62yt" targetRef="Activity_1ye6odb" />
     <bpmn:serviceTask id="Activity_1ye6odb" name="Проведение оплаты" camunda:type="external" camunda:topic="pay">
       <bpmn:incoming>Flow_0jzodwi</bpmn:incoming>
       <bpmn:outgoing>Flow_11jc707</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:boundaryEvent id="Event_10lcyl3" attachedToRef="Activity_1ye6odb">
-      <bpmn:outgoing>Flow_0f7hgnw</bpmn:outgoing>
-      <bpmn:errorEventDefinition id="ErrorEventDefinition_1ba2zsg" />
-    </bpmn:boundaryEvent>
-    <bpmn:sequenceFlow id="Flow_0f7hgnw" sourceRef="Event_10lcyl3" targetRef="Activity_1oky5hl" />
-    <bpmn:userTask id="Activity_1oky5hl" name="Ошибка оплаты" camunda:assignee="demo">
-      <bpmn:extensionElements>
-        <camunda:formData>
-          <camunda:formField id="error" label="Ошибка" type="string" />
-        </camunda:formData>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0f7hgnw</bpmn:incoming>
-      <bpmn:outgoing>Flow_1k7u3rs</bpmn:outgoing>
-    </bpmn:userTask>
     <bpmn:intermediateThrowEvent id="Event_1bgyr3z" name="Отправить успешную оплату">
       <bpmn:incoming>Flow_11jc707</bpmn:incoming>
       <bpmn:messageEventDefinition id="MessageEventDefinition_1ea1sif" messageRef="success-payment" />
@@ -219,16 +222,14 @@
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0t9v9qb" sourceRef="Event_0cllxeq" targetRef="Activity_1aajbvb" />
     <bpmn:sequenceFlow id="Flow_0ry2kga" sourceRef="Activity_1aajbvb" targetRef="Activity_099aqwr" />
-    <bpmn:userTask id="Activity_099aqwr" name="Заказ создан!" camunda:assignee="demo">
+    <bpmn:userTask id="Activity_099aqwr" name="Заказ создан!" camunda:assignee="${initiator}">
       <bpmn:incoming>Flow_0ry2kga</bpmn:incoming>
     </bpmn:userTask>
-    <bpmn:sequenceFlow id="Flow_1k7u3rs" sourceRef="Activity_1oky5hl" targetRef="Activity_0ev62yt" />
-    <bpmn:boundaryEvent id="Event_1ffngh0" attachedToRef="Activity_0hm9xdy">
-      <bpmn:outgoing>Flow_14edwje</bpmn:outgoing>
-      <bpmn:errorEventDefinition id="ErrorEventDefinition_1v6e974" />
-    </bpmn:boundaryEvent>
   </bpmn:process>
   <bpmn:message id="success-payment" name="success-payment" />
+  <bpmn:error id="Error_OrderInvalid" name="OrderInvalid" errorCode="ORDER_INVALID" />
+  <bpmn:error id="Error_PaymentInvalid" name="PaymentInvalid" errorCode="PAYMENT_INVALID" />
+  <bpmn:error id="Error_AddressInvalid" name="AddressInvalid" errorCode="ADDRESS_INVALID" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_14e79fj">
       <bpmndi:BPMNShape id="Participant_0lcd4j7_di" bpmnElement="Participant_0lcd4j7" isHorizontal="true">
@@ -284,10 +285,6 @@
         <dc:Bounds x="850" y="435" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_0v55h6y" bpmnElement="Activity_10773q9">
-        <dc:Bounds x="930" y="120" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0hm9xdy_di" bpmnElement="Activity_0hm9xdy" isExpanded="true">
         <dc:Bounds x="1570" y="515" width="630" height="305" />
         <bpmndi:BPMNLabel />
@@ -329,24 +326,12 @@
         <di:waypoint x="2080" y="610" />
         <di:waypoint x="2122" y="610" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Activity_18hr1ae_di" bpmnElement="Activity_18hr1ae">
-        <dc:Bounds x="2010" y="413" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_05vv7z3_di" bpmnElement="Activity_05vv7z3">
-        <dc:Bounds x="2000" y="160" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0ev62yt_di" bpmnElement="Activity_0ev62yt">
         <dc:Bounds x="2210" y="230" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1ye6odb_di" bpmnElement="Activity_1ye6odb">
         <dc:Bounds x="2400" y="730" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1oky5hl_di" bpmnElement="Activity_1oky5hl">
-        <dc:Bounds x="2420" y="170" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1bgyr3z_di" bpmnElement="Event_1bgyr3z">
@@ -366,17 +351,11 @@
         <dc:Bounds x="2850" y="220" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_10lcyl3_di" bpmnElement="Event_10lcyl3">
-        <dc:Bounds x="2452" y="712" width="36" height="36" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0txhx7k" bpmnElement="Event_0qntxt6">
         <dc:Bounds x="962" y="537" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1y1svlg_di" bpmnElement="Event_1y1svlg">
         <dc:Bounds x="902" y="417" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1ffngh0_di" bpmnElement="Event_1ffngh0">
-        <dc:Bounds x="1972" y="497" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0rhhjyf_di" bpmnElement="Flow_0rhhjyf">
         <di:waypoint x="238" y="285" />
@@ -430,28 +409,21 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1sm6ikt_di" bpmnElement="Flow_1sm6ikt">
         <di:waypoint x="920" y="417" />
-        <di:waypoint x="920" y="370" />
-        <di:waypoint x="980" y="370" />
-        <di:waypoint x="980" y="200" />
+        <di:waypoint x="920" y="170" />
+        <di:waypoint x="370" y="170" />
+        <di:waypoint x="370" y="245" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0hz0owr_di" bpmnElement="Flow_0hz0owr">
         <di:waypoint x="980" y="537" />
-        <di:waypoint x="980" y="200" />
+        <di:waypoint x="980" y="155" />
+        <di:waypoint x="370" y="155" />
+        <di:waypoint x="370" y="245" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0u6j49i_di" bpmnElement="Flow_0u6j49i">
         <di:waypoint x="1480" y="305" />
         <di:waypoint x="1525" y="305" />
         <di:waypoint x="1525" y="595" />
         <di:waypoint x="1570" y="595" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_14edwje_di" bpmnElement="Flow_14edwje">
-        <di:waypoint x="1990" y="497" />
-        <di:waypoint x="1990" y="453" />
-        <di:waypoint x="2010" y="453" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0c7g7yb_di" bpmnElement="Flow_0c7g7yb">
-        <di:waypoint x="2060" y="413" />
-        <di:waypoint x="2060" y="240" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0fdo5ge_di" bpmnElement="Flow_0fdo5ge">
         <di:waypoint x="2140" y="515" />
@@ -463,10 +435,6 @@
         <di:waypoint x="2340" y="270" />
         <di:waypoint x="2340" y="770" />
         <di:waypoint x="2400" y="770" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0f7hgnw_di" bpmnElement="Flow_0f7hgnw">
-        <di:waypoint x="2470" y="712" />
-        <di:waypoint x="2470" y="250" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_11jc707_di" bpmnElement="Flow_11jc707">
         <di:waypoint x="2500" y="770" />
@@ -482,11 +450,35 @@
         <di:waypoint x="2820" y="260" />
         <di:waypoint x="2850" y="260" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1k7u3rs_di" bpmnElement="Flow_1k7u3rs">
-        <di:waypoint x="2420" y="210" />
-        <di:waypoint x="2180" y="210" />
-        <di:waypoint x="2180" y="270" />
+      <bpmndi:BPMNShape id="Event_OrderInvalid_di" bpmnElement="Event_OrderInvalid">
+        <dc:Bounds x="1462" y="327" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_OrderRetry_di" bpmnElement="Flow_OrderRetry">
+        <di:waypoint x="1480" y="363" />
+        <di:waypoint x="1480" y="400" />
+        <di:waypoint x="1340" y="400" />
+        <di:waypoint x="1340" y="305" />
+        <di:waypoint x="1380" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_PaymentInvalid_di" bpmnElement="Event_PaymentInvalid">
+        <dc:Bounds x="2292" y="292" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_PaymentRetry_di" bpmnElement="Flow_PaymentRetry">
+        <di:waypoint x="2310" y="328" />
+        <di:waypoint x="2310" y="370" />
+        <di:waypoint x="2170" y="370" />
+        <di:waypoint x="2170" y="270" />
         <di:waypoint x="2210" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_AddressInvalid_di" bpmnElement="Event_AddressInvalid">
+        <dc:Bounds x="352" y="307" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_AddressRetry_di" bpmnElement="Flow_AddressRetry">
+        <di:waypoint x="370" y="343" />
+        <di:waypoint x="370" y="380" />
+        <di:waypoint x="280" y="380" />
+        <di:waypoint x="280" y="285" />
+        <di:waypoint x="320" y="285" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

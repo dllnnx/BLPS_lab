@@ -1,6 +1,5 @@
 package ru.itmo.clients;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,10 +13,10 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class GeocoderClient {
-    @Value("${secrets.geocoder}")
+    @Value("${secrets.geocoder:}")
     private String yandexMapsApiKey;
 
-    private final RestTemplate restTemplate = new RestTemplate();;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public Optional<Coordinates> getCoordinates(String address) {
         String url = String.format(
@@ -32,10 +31,21 @@ public class GeocoderClient {
 
             if (!featureMember.isEmpty()) {
                 Map<String, Object> geoObject = (Map<String, Object>) featureMember.get(0).get("GeoObject");
+                Map<String, Object> metaDataProperty = (Map<String, Object>) geoObject.get("metaDataProperty");
+                Map<String, Object> geocoderMetaData = (Map<String, Object>) metaDataProperty.get("GeocoderMetaData");
+                String precision = (String) geocoderMetaData.get("precision");
+                String kind = (String) geocoderMetaData.get("kind");
+
+                boolean preciseEnough = ("exact".equals(precision) || "number".equals(precision))
+                        && ("house".equals(kind) || "street".equals(kind));
+                if (!preciseEnough) {
+                    System.err.println("Address too imprecise: precision=" + precision + ", kind=" + kind);
+                    return Optional.empty();
+                }
+
                 Map<String, Object> point = (Map<String, Object>) geoObject.get("Point");
                 String pos = (String) point.get("pos"); // "25.197300 55.274243"
 
-                // Split and parse coordinates
                 String[] parts = pos.split(" ");
                 double longitude = Double.parseDouble(parts[0]);
                 double latitude = Double.parseDouble(parts[1]);

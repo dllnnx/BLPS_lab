@@ -12,8 +12,6 @@ import ru.itmo.dto.requests.DeliveryPriceRequest;
 import ru.itmo.dto.responses.DeliveryPriceResponse;
 import ru.itmo.services.DeliveryService;
 
-import java.math.RoundingMode;
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -24,7 +22,7 @@ public class SearchPickupPointWorker {
     @PostConstruct
     public void subscribe() {
         client.subscribe("search_pickup_point")
-                .lockDuration(1000)
+                .lockDuration(60_000)
                 .handler(this::execute)
                 .open();
     }

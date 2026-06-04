@@ -46,6 +46,8 @@ services:
     depends_on:
       db-ozon:
         condition: service_healthy
+      camunda:
+        condition: service_started
     environment:
       - DATABASE_HOST=db-ozon
       - DATABASE_PORT=5432
@@ -54,6 +56,7 @@ services:
       - PAYMENT_SERVICE_USERNAME=ozon-integration
       - PAYMENT_SERVICE_PASSWORD=ozon-secret
       - CAMUNDA_CLIENT_BASE_URL=http://camunda:8080/engine-rest
+      - SECRETS_GEOCODER=${SECRETS_GEOCODER:-}
     ports:
       - 8080:8080
       - 9090:9090
@@ -79,7 +82,9 @@ services:
       - backend
 
   camunda:
-    image: camunda/camunda-bpm-platform:run-7.21.0
+    build:
+      context: .
+      dockerfile: ./camunda.Dockerfile
     container_name: camunda
     ports:
       - "8082:8080"

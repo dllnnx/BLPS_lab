@@ -9,8 +9,6 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.springframework.stereotype.Component;
 import ru.itmo.services.OrderService;
 
-import java.util.UUID;
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -22,7 +20,7 @@ public class RemoveOrderWorker {
     @PostConstruct
     public void subscribe() {
         client.subscribe(topic)
-                .lockDuration(1000)
+                .lockDuration(60_000)
                 .handler(this::execute)
                 .open();
     }

@@ -6,6 +6,7 @@ COPY pom.xml .
 COPY ozon-service/pom.xml ozon-service/
 COPY payment-service/pom.xml payment-service/
 COPY schema-registry/pom.xml schema-registry/
+COPY bpmn-listeners/pom.xml bpmn-listeners/
 RUN mvn dependency:go-offline -pl ozon-service -am -B --no-transfer-progress
 
 COPY ozon-service/src ozon-service/src

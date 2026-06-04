@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
-import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import ru.itmo.dto.requests.PayRequest;
-import ru.itmo.dto.responses.CreatePaymentResponse;
 import ru.itmo.services.PaymentService;
 
 import java.util.Map;
@@ -27,8 +25,8 @@ import java.util.UUID;
 public class PayWorker {
     private final ExternalTaskClient client;
     private final PaymentService paymentService;
-    private RestTemplate restTemplate = new RestTemplate();
-    private String topic = "pay";
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final String topic = "pay";
 
     @Value("${camunda.client.base-url}")
     private String camundaUrl;
@@ -36,7 +34,7 @@ public class PayWorker {
     @PostConstruct
     public void subscribe() {
         client.subscribe(topic)
-                .lockDuration(1000)
+                .lockDuration(60_000)
                 .handler(this::execute)
                 .open();
     }
@@ -51,6 +49,7 @@ public class PayWorker {
             Long cardMonth = externalTask.getVariable("card_month");
             Long cardYear = externalTask.getVariable("card_year");
             String cvc = externalTask.getVariable("cvc");
+            String initiator = externalTask.getVariable("initiator");
             UUID paymentId = UUID.fromString(externalTask.getVariable("payment_id"));
 
             paymentService.pay(new PayRequest(
@@ -72,6 +71,10 @@ public class PayWorker {
                             "order_id", Map.of(
                                     "value", orderId,
                                     "type", "long"
+                            ),
+                            "initiator", Map.of(
+                                    "value", initiator,
+                                    "type", "string"
                             )
                     )
             );
