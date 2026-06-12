@@ -1,0 +1,24 @@
+<form role="form" name="orderConfirmForm">
+  <script cam-script type="text/form-script">
+    camForm.on('form-loaded', function() {
+      camForm.variableManager.fetchVariable('order_error');
+      camForm.variableManager.fetchVariable('delivery_cost_display');
+    });
+    camForm.on('variables-fetched', function() {
+      $scope.orderError   = camForm.variableManager.variableValue('order_error');
+      $scope.costDisplay  = camForm.variableManager.variableValue('delivery_cost_display');
+    });
+  </script>
+
+  <div ng-if="orderError" class="alert alert-danger">
+    <strong>Ошибка:</strong> {{ orderError }}
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading"><strong>Итог заказа</strong></div>
+    <div class="panel-body">
+      <p><strong>Стоимость доставки:</strong> {{ costDisplay || 'не рассчитана' }}</p>
+    </div>
+  </div>
+  <p class="text-muted">Нажмите <em>Complete</em> для перехода к оплате.</p>
+</form>

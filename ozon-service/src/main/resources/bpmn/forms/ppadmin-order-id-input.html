@@ -1,0 +1,27 @@
+<form role="form" name="orderIdForm">
+  <script cam-script type="text/form-script">
+    camForm.on('form-loaded', function() {
+      camForm.variableManager.fetchVariable('order_issue_error');
+    });
+    camForm.on('variables-fetched', function() {
+      $scope.issueError = camForm.variableManager.variableValue('order_issue_error');
+      if (!camForm.variableManager.variableValue('orderId'))
+        camForm.variableManager.variableValue('orderId', '1');
+    });
+  </script>
+
+  <div ng-if="issueError" class="alert alert-danger">
+    <strong>Ошибка выдачи:</strong> {{ issueError }}
+  </div>
+
+  <div class="form-group">
+    <label for="orderId">ID заказа</label>
+    <input id="orderId"
+           type="text"
+           class="form-control"
+           placeholder="Введите числовой ID заказа"
+           cam-variable-name="orderId"
+           cam-variable-type="String"
+           required />
+  </div>
+</form>

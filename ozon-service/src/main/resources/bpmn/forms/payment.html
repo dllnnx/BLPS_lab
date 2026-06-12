@@ -1,0 +1,65 @@
+<form role="form" name="paymentForm">
+  <script cam-script type="text/form-script">
+    camForm.on('form-loaded', function() {
+      camForm.variableManager.fetchVariable('payment_error');
+    });
+    camForm.on('variables-fetched', function() {
+      $scope.paymentError = camForm.variableManager.variableValue('payment_error');
+      if (!camForm.variableManager.variableValue('card_id'))
+        camForm.variableManager.variableValue('card_id', '4000000000000002');
+      if (!camForm.variableManager.variableValue('card_month'))
+        camForm.variableManager.variableValue('card_month', 12);
+      if (!camForm.variableManager.variableValue('card_year'))
+        camForm.variableManager.variableValue('card_year', 29);
+      if (!camForm.variableManager.variableValue('cvc'))
+        camForm.variableManager.variableValue('cvc', '111');
+    });
+  </script>
+
+  <div ng-if="paymentError" class="alert alert-danger">
+    <strong>Ошибка оплаты:</strong> {{ paymentError }}
+  </div>
+
+  <div class="form-group">
+    <label for="cardId">Номер карты (16 цифр)</label>
+    <input id="cardId"
+           type="text"
+           class="form-control"
+           cam-variable-name="card_id"
+           cam-variable-type="String" />
+  </div>
+
+  <div class="row">
+    <div class="col-xs-4">
+      <div class="form-group">
+        <label for="cardMonth">Месяц</label>
+        <input id="cardMonth"
+               type="number"
+               class="form-control"
+               min="1" max="12"
+               cam-variable-name="card_month"
+               cam-variable-type="Long" />
+      </div>
+    </div>
+    <div class="col-xs-4">
+      <div class="form-group">
+        <label for="cardYear">Год (2 цифры)</label>
+        <input id="cardYear"
+               type="number"
+               class="form-control"
+               cam-variable-name="card_year"
+               cam-variable-type="Long" />
+      </div>
+    </div>
+    <div class="col-xs-4">
+      <div class="form-group">
+        <label for="cvc">CVC</label>
+        <input id="cvc"
+               type="text"
+               class="form-control"
+               cam-variable-name="cvc"
+               cam-variable-type="String" />
+      </div>
+    </div>
+  </div>
+</form>

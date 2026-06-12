@@ -1,0 +1,27 @@
+<form role="form" name="addressForm">
+  <script cam-script type="text/form-script">
+    camForm.on('form-loaded', function() {
+      camForm.variableManager.fetchVariable('address_error');
+    });
+
+    camForm.on('variables-fetched', function() {
+      $scope.addressError = camForm.variableManager.variableValue('address_error');
+      if (!camForm.variableManager.variableValue('address_raw'))
+        camForm.variableManager.variableValue('address_raw', 'Ланское шоссе, 14к1');
+    });
+  </script>
+
+  <div ng-if="addressError" class="alert alert-danger">
+    <strong>Ошибка:</strong> {{ addressError }}
+  </div>
+
+  <div class="form-group">
+    <label for="address">Адрес доставки</label>
+    <input id="address"
+           type="text"
+           class="form-control"
+           cam-variable-name="address_raw"
+           cam-variable-type="String"
+           required />
+  </div>
+</form>

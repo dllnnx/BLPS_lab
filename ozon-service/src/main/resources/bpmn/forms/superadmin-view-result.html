@@ -1,0 +1,16 @@
+<form role="form" name="viewUpdateResultForm">
+  <script cam-script type="text/form-script">
+    camForm.on('form-loaded', function() {
+      camForm.variableManager.fetchVariable('update_result');
+    });
+    camForm.on('variables-fetched', function() {
+      $scope.result = camForm.variableManager.variableValue('update_result');
+    });
+  </script>
+
+  <div class="alert alert-success">
+    <span class="glyphicon glyphicon-ok"></span>
+    <strong>{{ result }}</strong>
+  </div>
+  <p class="text-muted">Нажмите <em>Complete</em> для продолжения.</p>
+</form>

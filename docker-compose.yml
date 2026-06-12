@@ -47,7 +47,7 @@ services:
       db-ozon:
         condition: service_healthy
       camunda:
-        condition: service_started
+        condition: service_healthy
     environment:
       - DATABASE_HOST=db-ozon
       - DATABASE_PORT=5432
@@ -56,6 +56,8 @@ services:
       - PAYMENT_SERVICE_USERNAME=ozon-integration
       - PAYMENT_SERVICE_PASSWORD=ozon-secret
       - CAMUNDA_CLIENT_BASE_URL=http://camunda:8080/engine-rest
+      - CAMUNDA_ADMIN_USERNAME=admin
+      - CAMUNDA_ADMIN_PASSWORD=admin
       - SECRETS_GEOCODER=${SECRETS_GEOCODER:-}
     ports:
       - 8080:8080
@@ -70,11 +72,15 @@ services:
     depends_on:
       db-payment-service:
         condition: service_healthy
+      camunda:
+        condition: service_healthy
     environment:
       - DATABASE_HOST=db-payment-service
       - DATABASE_PORT=5432
       - SERVER_PORT=8081
       - CAMUNDA_CLIENT_BASE_URL=http://camunda:8080/engine-rest
+      - CAMUNDA_ADMIN_USERNAME=admin
+      - CAMUNDA_ADMIN_PASSWORD=admin
     ports:
       - 8081:8081
       - 9091:9090
@@ -93,6 +99,12 @@ services:
     restart: unless-stopped
     environment:
       CAMUNDA_BPM_RUN_EXAMPLE_ENABLED: "false"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/engine-rest/engine > /dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
 
 #  activemq:
 #    image: rmohr/activemq

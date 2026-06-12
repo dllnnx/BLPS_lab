@@ -23,6 +23,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class CamundaUserSyncService {
 
     private static final String PROCESS_DEFINITION_KEY = "Process_1qfixpd";
+    private static final String PPADMIN_PROCESS_DEFINITION_KEY = "Process_0xcbqb9";
+    private static final String SUPERADMIN_PROCESS_DEFINITION_KEY = "Process_1710plk";
 
     private static final String GROUP_USER = "user";
     private static final String GROUP_PICKUP_POINT_ADMIN = "pickupPointAdmin";
@@ -30,6 +32,7 @@ public class CamundaUserSyncService {
     private static final String GROUP_CAMUNDA_ADMIN = "camunda-admin";
 
     private static final int RESOURCE_APPLICATION = 0;
+    private static final int RESOURCE_FILTER = 5;
     private static final int RESOURCE_PROCESS_DEFINITION = 6;
     private static final int RESOURCE_TASK = 7;
     private static final int RESOURCE_PROCESS_INSTANCE = 8;
@@ -78,6 +81,7 @@ public class CamundaUserSyncService {
         log.info("Syncing app_users to Camunda identity...");
         try {
             ensureGroups();
+            cleanupStaleAuthorizations();
             ensureGroupAuthorizations();
             appUserRepository.findAll().forEach(this::syncUser);
             syncDone.set(true);
@@ -149,25 +153,42 @@ public class CamundaUserSyncService {
         }
     }
 
+    private void cleanupStaleAuthorizations() {
+        revokeGroup(GROUP_PICKUP_POINT_ADMIN, RESOURCE_PROCESS_DEFINITION, "*");
+    }
+
     private void ensureGroupAuthorizations() {
-        // USER: tasklist + cockpit (so the user can log in at /cockpit and start the process)
+        // USER: can see and start only the customer order flow
         grantGroup(GROUP_USER, RESOURCE_APPLICATION, "tasklist", List.of("ACCESS"));
         grantGroup(GROUP_USER, RESOURCE_APPLICATION, "cockpit", List.of("ACCESS"));
+        grantGroup(GROUP_USER, RESOURCE_FILTER, "*", List.of("READ", "CREATE"));
         grantGroup(GROUP_USER, RESOURCE_PROCESS_DEFINITION, PROCESS_DEFINITION_KEY,
                 List.of("READ", "READ_INSTANCE", "CREATE_INSTANCE", "READ_TASK"));
         grantGroup(GROUP_USER, RESOURCE_PROCESS_INSTANCE, "*", List.of("CREATE", "READ"));
         grantGroup(GROUP_USER, RESOURCE_TASK, "*", List.of("READ", "UPDATE", "TASK_WORK"));
 
-        // PICKUP_POINT_ADMIN: tasklist + cockpit, view-all on processes
+        // PICKUP_POINT_ADMIN: can see and start the customer flow AND the ppadmin flow
         grantGroup(GROUP_PICKUP_POINT_ADMIN, RESOURCE_APPLICATION, "tasklist", List.of("ACCESS"));
         grantGroup(GROUP_PICKUP_POINT_ADMIN, RESOURCE_APPLICATION, "cockpit", List.of("ACCESS"));
-        grantGroup(GROUP_PICKUP_POINT_ADMIN, RESOURCE_PROCESS_DEFINITION, "*",
-                List.of("READ", "READ_INSTANCE", "READ_TASK"));
-        grantGroup(GROUP_PICKUP_POINT_ADMIN, RESOURCE_PROCESS_INSTANCE, "*", List.of("READ"));
+        grantGroup(GROUP_PICKUP_POINT_ADMIN, RESOURCE_FILTER, "*", List.of("READ", "CREATE"));
+        grantGroup(GROUP_PICKUP_POINT_ADMIN, RESOURCE_PROCESS_DEFINITION, PROCESS_DEFINITION_KEY,
+                List.of("READ", "READ_INSTANCE", "CREATE_INSTANCE", "READ_TASK"));
+        grantGroup(GROUP_PICKUP_POINT_ADMIN, RESOURCE_PROCESS_DEFINITION, PPADMIN_PROCESS_DEFINITION_KEY,
+                List.of("READ", "READ_INSTANCE", "CREATE_INSTANCE", "READ_TASK"));
+        grantGroup(GROUP_PICKUP_POINT_ADMIN, RESOURCE_PROCESS_INSTANCE, "*", List.of("CREATE", "READ"));
         grantGroup(GROUP_PICKUP_POINT_ADMIN, RESOURCE_TASK, "*", List.of("READ", "UPDATE", "TASK_WORK"));
 
-        // ADMIN: full app access. camunda-admin group membership (added per-user) covers the rest.
+        // ADMIN (superadmin): full app access + explicit grants on all three process definitions
         grantGroup(GROUP_APP_ADMIN, RESOURCE_APPLICATION, "*", List.of("ALL"));
+        grantGroup(GROUP_APP_ADMIN, RESOURCE_FILTER, "*", List.of("READ", "CREATE", "UPDATE", "DELETE"));
+        grantGroup(GROUP_APP_ADMIN, RESOURCE_PROCESS_DEFINITION, PROCESS_DEFINITION_KEY,
+                List.of("READ", "READ_INSTANCE", "CREATE_INSTANCE", "READ_TASK"));
+        grantGroup(GROUP_APP_ADMIN, RESOURCE_PROCESS_DEFINITION, PPADMIN_PROCESS_DEFINITION_KEY,
+                List.of("READ", "READ_INSTANCE", "CREATE_INSTANCE", "READ_TASK"));
+        grantGroup(GROUP_APP_ADMIN, RESOURCE_PROCESS_DEFINITION, SUPERADMIN_PROCESS_DEFINITION_KEY,
+                List.of("READ", "READ_INSTANCE", "CREATE_INSTANCE", "READ_TASK"));
+        grantGroup(GROUP_APP_ADMIN, RESOURCE_PROCESS_INSTANCE, "*", List.of("CREATE", "READ"));
+        grantGroup(GROUP_APP_ADMIN, RESOURCE_TASK, "*", List.of("READ", "UPDATE", "TASK_WORK"));
     }
 
     private void grantGroup(String groupId, int resourceType, String resourceId, List<String> permissions) {
@@ -187,6 +208,34 @@ public class CamundaUserSyncService {
                     groupId, permissions, resourceType, resourceId);
         } catch (Exception e) {
             log.warn("Could not grant group '{}' permissions on resourceType={} resourceId='{}': {}",
+                    groupId, resourceType, resourceId, e.getMessage());
+        }
+    }
+
+    private void revokeGroup(String groupId, int resourceType, String resourceId) {
+        try {
+            @SuppressWarnings("unchecked")
+            var response = camundaRestTemplate.getForEntity(
+                    camundaBaseUrl + "/authorization?type=1&groupIdIn=" + groupId
+                            + "&resourceType=" + resourceType
+                            + "&resourceId=" + resourceId,
+                    List.class);
+            List<?> body = response.getBody();
+            if (body == null || body.isEmpty()) {
+                return;
+            }
+            for (Object entry : body) {
+                if (entry instanceof Map<?, ?> m) {
+                    Object id = m.get("id");
+                    if (id != null) {
+                        camundaRestTemplate.delete(camundaBaseUrl + "/authorization/" + id);
+                        log.info("Revoked authorization {} from group '{}' on resourceType={} resourceId='{}'",
+                                id, groupId, resourceType, resourceId);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Could not revoke group '{}' on resourceType={} resourceId='{}': {}",
                     groupId, resourceType, resourceId, e.getMessage());
         }
     }

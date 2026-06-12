@@ -1,0 +1,18 @@
+<form role="form" name="deliveryCostForm">
+  <script cam-script type="text/form-script">
+    camForm.on('form-loaded', function() {
+      camForm.variableManager.fetchVariable('delivery_cost_display');
+    });
+    camForm.on('variables-fetched', function() {
+      $scope.costDisplay = camForm.variableManager.variableValue('delivery_cost_display');
+    });
+  </script>
+
+  <div class="panel panel-info">
+    <div class="panel-heading"><strong>Рассчитанная стоимость доставки</strong></div>
+    <div class="panel-body">
+      <p class="lead">{{ costDisplay || 'Загрузка...' }}</p>
+    </div>
+  </div>
+  <p class="text-muted">Нажмите <em>Complete</em> для перехода к подтверждению.</p>
+</form>

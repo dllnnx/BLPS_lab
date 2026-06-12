@@ -1,0 +1,10 @@
+camunda.bpm:
+  authorization:
+    enabled: true
+  run:
+    auth:
+      enabled: true
+  admin-user:
+    id: admin
+    password: admin
+    firstName: Admin

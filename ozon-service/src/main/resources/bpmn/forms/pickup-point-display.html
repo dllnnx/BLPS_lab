@@ -1,0 +1,18 @@
+<form role="form" name="pickupPointForm">
+  <script cam-script type="text/form-script">
+    camForm.on('form-loaded', function() {
+      camForm.variableManager.fetchVariable('delivery_pickup_point_display');
+    });
+    camForm.on('variables-fetched', function() {
+      $scope.ppDisplay = camForm.variableManager.variableValue('delivery_pickup_point_display');
+    });
+  </script>
+
+  <div class="panel panel-success">
+    <div class="panel-heading"><strong>Ваш ближайший ПВЗ</strong></div>
+    <div class="panel-body">
+      <p class="lead">{{ ppDisplay || 'Загрузка...' }}</p>
+    </div>
+  </div>
+  <p class="text-muted">Нажмите <em>Complete</em> для подтверждения.</p>
+</form>

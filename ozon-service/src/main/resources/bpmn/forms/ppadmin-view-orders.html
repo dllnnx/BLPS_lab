@@ -1,0 +1,18 @@
+<form role="form" name="viewOrdersForm">
+  <script cam-script type="text/form-script">
+    camForm.on('form-loaded', function() {
+      camForm.variableManager.fetchVariable('pickup_point_orders_display');
+    });
+    camForm.on('variables-fetched', function() {
+      $scope.ordersDisplay = camForm.variableManager.variableValue('pickup_point_orders_display');
+    });
+  </script>
+
+  <div class="panel panel-default">
+    <div class="panel-heading"><strong>Заказы вашего ПВЗ</strong></div>
+    <div class="panel-body">
+      <pre style="white-space: pre-wrap; word-break: break-word;">{{ ordersDisplay || 'Заказов нет' }}</pre>
+    </div>
+  </div>
+  <p class="text-muted">Нажмите <em>Complete</em> для продолжения.</p>
+</form>

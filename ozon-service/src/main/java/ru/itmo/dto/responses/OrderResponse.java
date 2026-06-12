@@ -13,4 +13,5 @@ public class OrderResponse {
     private OrderStatus orderStatus;
     private PickupPointResponse pickupPoint;
     private String deliveryAddress;
+    private String username;
 }

@@ -45,7 +45,9 @@ public class CalculateDeliveryWorker {
             log.error(e.getMessage());
             externalTaskService.handleBpmnError(
                     externalTask,
-                    "Возникла ошибка при расчете стоимости доставки");
+                    "ADDRESS_DELIVERY_ERROR",
+                    e.getMessage(),
+                    Variables.createVariables().putValue("address_error", e.getMessage()));
         }
     }
 }

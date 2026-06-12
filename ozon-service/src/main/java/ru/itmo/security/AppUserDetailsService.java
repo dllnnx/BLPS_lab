@@ -21,8 +21,8 @@ public class AppUserDetailsService implements UserDetailsService {
 
     private static final Map<String, List<String>> ROLE_PRIVILEGES = Map.of(
             "USER", List.of("ORDER_CREATE", "ORDER_VIEW_OWN", "ORDER_CANCEL_OWN"),
-            "PICKUP_POINT_ADMIN", List.of("ORDER_VIEW_PICKUP_POINT", "ORDER_UPDATE_PICKUP_POINT_STATUS"),
-            "ADMIN", List.of("ORDER_VIEW_ALL", "ORDER_UPDATE_ALL")
+            "PICKUP_POINT_ADMIN", List.of("ORDER_CREATE", "ORDER_VIEW_OWN", "ORDER_CANCEL_OWN", "ORDER_VIEW_PICKUP_POINT", "ORDER_UPDATE_PICKUP_POINT_STATUS"),
+            "ADMIN", List.of("ORDER_CREATE", "ORDER_VIEW_OWN", "ORDER_CANCEL_OWN","ORDER_VIEW_PICKUP_POINT", "ORDER_UPDATE_PICKUP_POINT_STATUS", "ORDER_VIEW_ALL", "ORDER_UPDATE_ALL")
     );
 
     private final AppUserRepository appUserRepository;

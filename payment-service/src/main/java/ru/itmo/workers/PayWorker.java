@@ -1,11 +1,11 @@
 package ru.itmo.workers;
 
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,13 +20,19 @@ import java.util.Map;
 import java.util.UUID;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class PayWorker {
     private final ExternalTaskClient client;
     private final PaymentService paymentService;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     private final String topic = "pay";
+
+    public PayWorker(ExternalTaskClient client, PaymentService paymentService,
+                     @Qualifier("camundaRestTemplate") RestTemplate restTemplate) {
+        this.client = client;
+        this.paymentService = paymentService;
+        this.restTemplate = restTemplate;
+    }
 
     @Value("${camunda.client.base-url}")
     private String camundaUrl;
